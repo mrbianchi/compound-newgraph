@@ -1,6 +1,8 @@
 ### Custom ###
 build/
 src/types/
+tests/.bin/
+tests/.latest.json
 
 # Created by https://www.toptal.com/developers/gitignore/api/node,webstorm,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=node,webstorm,macos

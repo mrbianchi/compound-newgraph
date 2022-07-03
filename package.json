@@ -4,8 +4,8 @@
   "private": true,
   "license": "UNLICENSED",
   "engines": {
-    "node": "16.15.1",
-    "yarn": "1.22.19"
+    "node": "16.15.x",
+    "yarn": "1.22.x"
   },
   "scripts": {
     "postinstall": "husky install",
@@ -13,7 +13,7 @@
     "format:fix": "prettier --write .",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "test": "jest --passWithNoTests",
+    "test": "graph test",
     "codegen": "graph codegen --output-dir src/types/",
     "build": "graph build",
     "create-local": "graph create subgraph --node http://localhost:8020",
@@ -23,16 +23,14 @@
   "devDependencies": {
     "@graphprotocol/graph-cli": "0.32.0",
     "@graphprotocol/graph-ts": "0.27.0",
-    "@types/jest": "28.1.4",
     "@types/node": "18.0.0",
     "@typescript-eslint/eslint-plugin": "5.30.3",
     "@typescript-eslint/parser": "5.30.3",
     "eslint": "8.19.0",
     "eslint-config-prettier": "8.5.0",
     "husky": "8.0.1",
-    "jest": "28.1.2",
+    "matchstick-as": "0.5.0",
     "prettier": "2.7.1",
-    "ts-jest": "28.0.5",
     "ts-node": "10.8.2",
     "typescript": "4.7.4"
   }
