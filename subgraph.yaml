@@ -1,0 +1,66 @@
+specVersion: 0.0.4
+description: aDescription
+repository: aRepository
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Comptroller
+    source:
+      abi: Comptroller
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/comptroller/index.ts
+      entities:
+        - Comptroller
+        - Market
+      abis:
+        - name: Comptroller
+          file: ./abis/comptroller.json
+        - name: CToken
+          file: ./abis/cToken.json
+        - name: PriceOracle
+          file: ./abis/priceOracle.json
+      eventHandlers:
+        - event: MarketListed(address)
+          handler: handleMarketListed
+        - event: MarketEntered(address,address)
+          handler: handleMarketEntered
+        - event: MarketExited(address,address)
+          handler: handleMarketExited
+        - event: NewCloseFactor(uint256,uint256)
+          handler: handleNewCloseFactor
+        - event: NewCollateralFactor(address,uint256,uint256)
+          handler: handleNewCollateralFactor
+        - event: NewLiquidationIncentive(uint256,uint256)
+          handler: handleNewLiquidationIncentive
+        - event: NewPriceOracle(address,address)
+          handler: handleNewPriceOracle
+        - event: NewPauseGuardian(address,address)
+          handler: handleNewPauseGuardian
+        - event: ActionPaused(string,bool)
+          handler: handleGloballyActionPaused
+        - event: ActionPaused(address,string,bool)
+          handler: handleMarketActionPaused
+        - event: CompBorrowSpeedUpdated(indexed address,uint256)
+          handler: handleCompBorrowSpeedUpdated
+        - event: CompSupplySpeedUpdated(indexed address,uint256)
+          handler: handleCompSupplySpeedUpdated
+        - event: ContributorCompSpeedUpdated(indexed address,uint256)
+          handler: handleContributorCompSpeedUpdated
+        - event: DistributedSupplierComp(indexed address,indexed address,uint256,uint256)
+          handler: handleDistributedSupplierComp
+        - event: DistributedBorrowerComp(indexed address,indexed address,uint256,uint256)
+          handler: handleDistributedBorrowerComp
+        - event: NewBorrowCap(indexed address,uint256)
+          handler: handleNewBorrowCap
+        - event: NewBorrowCapGuardian(address,address)
+          handler: handleNewBorrowCapGuardian
+        - event: CompGranted(address,uint256)
+          handler: handleCompGranted
+        - event: CompAccruedAdjusted(indexed address,uint256,uint256)
+          handler: handleCompAccruedAdjusted
+        - event: CompReceivableUpdated(indexed address,uint256,uint256)
+          handler: handleCompReceivableUpdated
