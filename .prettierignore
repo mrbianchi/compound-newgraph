@@ -1,1 +1,5 @@
+build/
+src/types/
+tests/.bin/
+tests/.latest.json
 schema.graphql
