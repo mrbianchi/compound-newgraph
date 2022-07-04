@@ -1,8 +1,14 @@
 {
   "mainnet": {
     "Comptroller": {
-      "address": "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B",
+      "address": "0xf1a1dFAefabA7d23CE64CCED4d32f72ed7c24Cbe",
       "startBlock": 7710670
+    }
+  },
+  "kovan": {
+    "Comptroller": {
+      "address": "0xf1a1dFAefabA7d23CE64CCED4d32f72ed7c24Cbe",
+      "startBlock": 31944840
     }
   }
 }

@@ -18,7 +18,8 @@
     "build": "graph build",
     "create-local": "graph create subgraph --node http://localhost:8020",
     "deploy-local": "graph deploy subgraph --debug --ipfs http://localhost:5001 --node http://localhost:8020/",
-    "watch-local": "graph deploy subgraph --watch --debug --node http://localhost:8020/ --ipfs http://localhost:5001"
+    "watch-local": "graph deploy subgraph --watch --debug --node http://localhost:8020/ --ipfs http://localhost:5001",
+    "deploy:kovan": "graph deploy --product hosted-service javier747belbruno/compound-new-graph"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "0.32.0",

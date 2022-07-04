@@ -7,7 +7,7 @@ export function handleMarketEntered(event: MarketEntered): void {
   const market = Market.load(event.params.cToken.toHexString());
 
   if (!market) {
-    log.info("Market({}) not found", [event.params.cToken.toString()]);
+    log.info("Market({}) not found", [event.params.cToken.toHexString()]);
     return;
   }
 
