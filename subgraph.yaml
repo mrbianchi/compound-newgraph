@@ -8,6 +8,8 @@ dataSources:
     name: Comptroller
     source:
       abi: Comptroller
+      address: "0xf1a1dFAefabA7d23CE64CCED4d32f72ed7c24Cbe"
+      startBlock: 31944840
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -64,3 +66,4 @@ dataSources:
           handler: handleCompAccruedAdjusted
         - event: CompReceivableUpdated(indexed address,uint256,uint256)
           handler: handleCompReceivableUpdated
+    network: kovan
