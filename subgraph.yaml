@@ -112,11 +112,14 @@ dataSources:
           handler: handleNewPendingAdmin
         - event: NewDelay(indexed uint256)
           handler: handleNewDelay
-        - event: CancelTransaction(indexed bytes32,indexed address,uint256,string,bytes,uint256)
+        - event: CancelTransaction(indexed bytes32,indexed
+            address,uint256,string,bytes,uint256)
           handler: handleCancelTransaction
-        - event: ExecuteTransaction(indexed bytes32,indexed address,uint256,string,bytes,uint256)
+        - event: ExecuteTransaction(indexed bytes32,indexed
+            address,uint256,string,bytes,uint256)
           handler: handleExecuteTransaction
-        - event: QueueTransaction(indexed bytes32,indexed address,uint256,string,bytes,uint256)
+        - event: QueueTransaction(indexed bytes32,indexed
+            address,uint256,string,bytes,uint256)
           handler: handleQueueTransaction
   - kind: ethereum/contract
     name: Comp
@@ -142,47 +145,6 @@ dataSources:
         - event: Approval(indexed address,indexed address,uint256)
           handler: handleApproval
   - kind: ethereum/contract
-    name: GovernorBravoDelegate
-    source:
-      abi: GovernorBravoDelegate
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      file: ./src/mappings/governor/bravo/delegate/index.ts
-      entities:
-        - GovernorBravoDelegate
-      abis:
-        - name: GovernorBravoDelegate
-          file: ./abis/governorBravoDelegate.json
-      eventHandlers:
-        - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
-          handler: handleProposalCreated
-        - event: VoteCast(indexed address,uint256,uint8,uint256,string)
-          handler: handleVoteCast
-        - event: ProposalCanceled(uint256)
-          handler: handleProposalCanceled
-        - event: ProposalQueued(uint256,uint256)
-          handler: handleProposalQueued
-        - event: ProposalExecuted(uint256)
-          handler: handleProposalExecuted
-        - event: VotingDelaySet(uint256,uint256)
-          handler: handleVotingDelaySet
-        - event: VotingPeriodSet(uint256,uint256)
-          handler: handleVotingPeriodSet
-        - event: NewImplementation(address,address)
-          handler: handleNewImplementation
-        - event: ProposalThresholdSet(uint256,uint256)
-          handler: handleProposalThresholdSet
-        - event: NewPendingAdmin(address,address)
-          handler: handleNewPendingAdmin
-        - event: NewAdmin(address,address)
-          handler: handleNewAdmin
-        - event: WhitelistAccountExpirationSet(address,uint256)
-          handler: handleWhitelistAccountExpirationSet
-        - event: WhitelistGuardianSet(address,address)
-          handler: handleWhitelistGuardianSet
-  - kind: ethereum/contract
     name: GovernorBravoDelegator
     source:
       abi: GovernorBravoDelegator
@@ -190,7 +152,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/mappings/governor/bravo/delegator/index.ts
+      file: ./src/mappings/governor/index.ts
       entities:
         - GovernorBravoDelegator
       abis:
@@ -223,31 +185,6 @@ dataSources:
           handler: handleWhitelistAccountExpirationSet
         - event: WhitelistGuardianSet(address,address)
           handler: handleWhitelistGuardianSet
-  - kind: ethereum/contract
-    name: GovernorAlpha
-    source:
-      abi: GovernorAlpha
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      file: ./src/mappings/governor/alpha/index.ts
-      entities:
-        - GovernorAlpha
-      abis:
-        - name: GovernorAlpha
-          file: ./abis/governorAlpha.json
-      eventHandlers:
-        - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
-          handler: handleProposalCreated
-        - event: VoteCast(address,uint256,bool,uint256)
-          handler: handleVoteCast
-        - event: ProposalCanceled(uint256)
-          handler: handleProposalCanceled
-        - event: ProposalQueued(uint256,uint256)
-          handler: handleProposalQueued
-        - event: ProposalExecuted(uint256)
-          handler: handleProposalExecuted
   - kind: ethereum/contract
     name: WhitePaperInterestRateModel
     source:
