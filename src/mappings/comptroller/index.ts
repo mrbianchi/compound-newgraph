@@ -6,6 +6,7 @@ export * from "./compSupplySpeedUpdatedMapping";
 export * from "./contributorCompSpeedUpdatedMapping";
 export * from "./distributedBorrowerCompMapping";
 export * from "./distributedSupplierCompMapping";
+export * from "./failureMapping";
 export * from "./globallyActionPausedMapping";
 export * from "./marketActionPausedMapping";
 export * from "./marketEnteredMapping";

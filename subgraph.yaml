@@ -5,11 +5,34 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
+    name: Unitroller
+    source:
+      abi: Unitroller
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/unitroller/index.ts
+      entities:
+        - Unitroller
+      abis:
+        - name: Unitroller
+          file: ./abis/unitroller.json
+      eventHandlers:
+        - event: Failure(uint256,uint256,uint256)
+          handler: handleFailure
+        - event: NewPendingImplementation(address,address)
+          handler: handleNewPendingImplementation
+        - event: NewImplementation(address,address)
+          handler: handleNewImplementation
+        - event: NewPendingAdmin(address,address)
+          handler: handleNewPendingAdmin
+        - event: NewAdmin(address,address)
+          handler: NewAdmin
+  - kind: ethereum/contract
     name: Comptroller
     source:
       abi: Comptroller
-      address: "0xf1a1dFAefabA7d23CE64CCED4d32f72ed7c24Cbe"
-      startBlock: 31944840
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -26,6 +49,8 @@ dataSources:
         - name: PriceOracle
           file: ./abis/priceOracle.json
       eventHandlers:
+        - event: Failure(uint256,uint256,uint256)
+          handler: handleFailure
         - event: MarketListed(address)
           handler: handleMarketListed
         - event: MarketEntered(address,address)
@@ -66,4 +91,211 @@ dataSources:
           handler: handleCompAccruedAdjusted
         - event: CompReceivableUpdated(indexed address,uint256,uint256)
           handler: handleCompReceivableUpdated
-    network: kovan
+  - kind: ethereum/contract
+    name: Timelock
+    source:
+      abi: Timelock
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/timeLock/index.ts
+      entities:
+        - Timelock
+      abis:
+        - name: Timelock
+          file: ./abis/timelock.json
+      eventHandlers:
+        - event: NewAdmin(indexed address)
+          handler: handleNewAdmin
+        - event: NewPendingAdmin(indexed address)
+          handler: handleNewPendingAdmin
+        - event: NewDelay(indexed uint256)
+          handler: handleNewDelay
+        - event: CancelTransaction(indexed bytes32,indexed
+            address,uint256,string,bytes,uint256)
+          handler: handleCancelTransaction
+        - event: ExecuteTransaction(indexed bytes32,indexed
+            address,uint256,string,bytes,uint256)
+          handler: handleExecuteTransaction
+        - event: QueueTransaction(indexed bytes32,indexed
+            address,uint256,string,bytes,uint256)
+          handler: handleQueueTransaction
+  - kind: ethereum/contract
+    name: Comp
+    source:
+      abi: Comp
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/comp/index.ts
+      entities:
+        - Comp
+      abis:
+        - name: Comp
+          file: ./abis/comp.json
+      eventHandlers:
+        - event: DelegateChanged(indexed address,indexed address,indexed address)
+          handler: handleDelegateChanged
+        - event: DelegateVotesChanged(indexed address,uint256,uint256)
+          handler: handleDelegateVotesChanged
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+  - kind: ethereum/contract
+    name: GovernorBravoDelegator
+    source:
+      abi: GovernorBravoDelegator
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/governor/index.ts
+      entities:
+        - GovernorBravoDelegator
+      abis:
+        - name: GovernorBravoDelegator
+          file: ./abis/governorBravoDelegator.json
+      eventHandlers:
+        - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
+          handler: handleProposalCreated
+        - event: VoteCast(indexed address,uint256,uint8,uint256,string)
+          handler: handleVoteCast
+        - event: ProposalCanceled(uint256)
+          handler: handleProposalCanceled
+        - event: ProposalQueued(uint256,uint256)
+          handler: handleProposalQueued
+        - event: ProposalExecuted(uint256)
+          handler: handleProposalExecuted
+        - event: VotingDelaySet(uint256,uint256)
+          handler: handleVotingDelaySet
+        - event: VotingPeriodSet(uint256,uint256)
+          handler: handleVotingPeriodSet
+        - event: NewImplementation(address,address)
+          handler: handleNewImplementation
+        - event: ProposalThresholdSet(uint256,uint256)
+          handler: handleProposalThresholdSet
+        - event: NewPendingAdmin(address,address)
+          handler: handleNewPendingAdmin
+        - event: NewAdmin(address,address)
+          handler: handleNewAdmin
+        - event: WhitelistAccountExpirationSet(address,uint256)
+          handler: handleWhitelistAccountExpirationSet
+        - event: WhitelistGuardianSet(address,address)
+          handler: handleWhitelistGuardianSet
+  - kind: ethereum/contract
+    name: WhitePaperInterestRateModel
+    source:
+      abi: WhitePaperInterestRateModel
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/interestRateModels/whitePaper/index.ts
+      entities:
+        - WhitePaperInterestRateModel
+      abis:
+        - name: WhitePaperInterestRateModel
+          file: ./abis/whitePaperInterestRateModel.json
+      eventHandlers:
+        - event: NewInterestParams(uint256,uint256)
+          handler: handleNewInterestParams
+  - kind: ethereum/contract
+    name: JumpRateModel
+    source:
+      abi: JumpRateModel
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/interestRateModels/jump/index.ts
+      entities:
+        - JumpRateModel
+      abis:
+        - name: JumpRateModel
+          file: ./abis/jumpRateModel.json
+      eventHandlers:
+        - event: NewInterestParams(uint256,uint256,uint256,uint256)
+          handler: handleNewInterestParams
+  - kind: ethereum/contract
+    name: JumpRateModelV2
+    source:
+      abi: JumpRateModelV2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/interestRateModels/jumpV2/index.ts
+      entities:
+        - JumpRateModelV2
+      abis:
+        - name: JumpRateModelV2
+          file: ./abis/jumpRateModelV2.json
+      eventHandlers:
+        - event: NewInterestParams(uint256,uint256,uint256,uint256)
+          handler: handleNewInterestParams
+  - kind: ethereum/contract
+    name: DAIInterestRateModelV3
+    source:
+      abi: DAIInterestRateModelV3
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/interestRateModels/dai/index.ts
+      entities:
+        - DAIInterestRateModelV3
+      abis:
+        - name: DAIInterestRateModelV3
+          file: ./abis/DAIInterestRateModelV3.json
+      eventHandlers:
+        - event: NewInterestParams(uint256,uint256,uint256,uint256)
+          handler: handleNewInterestParams
+templates:
+  - name: CToken
+    kind: ethereum/contract
+    source:
+      abi: CToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/cToken/index.ts
+      entities:
+        - Market
+      abis:
+        - name: CToken
+          file: ./abis/cToken.json
+      eventHandlers:
+        - event: AccrueInterest(uint256,uint256,uint256,uint256)
+          handler: handleAccrueInterest
+        - event: Mint(address,uint256,uint256)
+          handler: handleMint
+        - event: Redeem(address,uint256,uint256)
+          handler: handleRedeem
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+        - event: NewPendingAdmin(address,address)
+          handler: handleNewPendingAdmin
+        - event: NewAdmin(address,address)
+          handler: handleNewAdmin
+        - event: NewComptroller(address,address)
+          handler: handleNewComptroller
+        - event: NewMarketInterestRateModel(address,address)
+          handler: handleNewMarketInterestRateModel
+        - event: NewReserveFactor(uint256,uint256)
+          handler: handleNewReserveFactor
+        - event: ReservesAdded(address,uint256,uint256)
+          handler: handleReservesAdded
+        - event: ReservesReduced(address,uint256,uint256)
+          handler: handleReservesReduced
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval

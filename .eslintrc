@@ -1,6 +1,21 @@
 {
+  "root": true,
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint"],
-  "extends": ["plugin:@typescript-eslint/recommended", "prettier"],
-  "ignorePatterns": ["build/", "src/types", "tests/.bin/", "tests/.latest.json"]
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/recommended",
+    "prettier"
+  ],
+  "ignorePatterns": ["build/", "src/types", "tests/.bin/", "tests/.latest.json"],
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".ts"],
+        "moduleDirectory": ["node_modules", "src/"]
+      }
+    }
+  }
 }
