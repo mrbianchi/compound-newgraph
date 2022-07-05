@@ -40,5 +40,11 @@
       "address": "0x0000000000000000000000000000000000000000",
       "startBlock": 0
     }
+  },
+  "kovan": {
+    "Comptroller": {
+      "address": "0xf1a1dFAefabA7d23CE64CCED4d32f72ed7c24Cbe",
+      "startBlock": 31944840
+    }
   }
 }
