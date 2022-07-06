@@ -45,6 +45,42 @@
     "Comptroller": {
       "address": "0xf1a1dFAefabA7d23CE64CCED4d32f72ed7c24Cbe",
       "startBlock": 31944840
+    },
+    "Unitroller": {
+      "address": "0xf1a1dFAefabA7d23CE64CCED4d32f72ed7c24Cbe",
+      "startBlock": 31944840
+    },
+    "Timelock": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "startBlock": 32600000
+    },
+    "Comp": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "startBlock": 32600000
+    },
+    "GovernorBravoDelegator": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "startBlock": 32600000
+    },
+    "GovernorAlpha": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "startBlock": 32600000
+    },
+    "WhitePaperInterestRateModel": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "startBlock": 32600000
+    },
+    "JumpRateModel": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "startBlock": 32600000
+    },
+    "JumpRateModelV2": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "startBlock": 32600000
+    },
+    "DAIInterestRateModelV3": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "startBlock": 32600000
     }
   }
 }

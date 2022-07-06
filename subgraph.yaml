@@ -8,6 +8,8 @@ dataSources:
     name: Unitroller
     source:
       abi: Unitroller
+      address: "0xf1a1dFAefabA7d23CE64CCED4d32f72ed7c24Cbe"
+      startBlock: 31944840
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -29,10 +31,13 @@ dataSources:
           handler: handleNewPendingAdmin
         - event: NewAdmin(address,address)
           handler: NewAdmin
+    network: kovan
   - kind: ethereum/contract
     name: Comptroller
     source:
       abi: Comptroller
+      address: "0xf1a1dFAefabA7d23CE64CCED4d32f72ed7c24Cbe"
+      startBlock: 31944840
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -48,6 +53,8 @@ dataSources:
           file: ./abis/cToken.json
         - name: PriceOracle
           file: ./abis/priceOracle.json
+        - name: ERC20
+          file: ./abis/erc20.json
       eventHandlers:
         - event: Failure(uint256,uint256,uint256)
           handler: handleFailure
@@ -91,10 +98,13 @@ dataSources:
           handler: handleCompAccruedAdjusted
         - event: CompReceivableUpdated(indexed address,uint256,uint256)
           handler: handleCompReceivableUpdated
+    network: kovan
   - kind: ethereum/contract
     name: Timelock
     source:
       abi: Timelock
+      address: "0x0000000000000000000000000000000000000000"
+      startBlock: 32600000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -121,10 +131,13 @@ dataSources:
         - event: QueueTransaction(indexed bytes32,indexed
             address,uint256,string,bytes,uint256)
           handler: handleQueueTransaction
+    network: kovan
   - kind: ethereum/contract
     name: Comp
     source:
       abi: Comp
+      address: "0x0000000000000000000000000000000000000000"
+      startBlock: 32600000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -144,10 +157,13 @@ dataSources:
           handler: handleTransfer
         - event: Approval(indexed address,indexed address,uint256)
           handler: handleApproval
+    network: kovan
   - kind: ethereum/contract
     name: GovernorBravoDelegator
     source:
       abi: GovernorBravoDelegator
+      address: "0x0000000000000000000000000000000000000000"
+      startBlock: 32600000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -185,10 +201,13 @@ dataSources:
           handler: handleWhitelistAccountExpirationSet
         - event: WhitelistGuardianSet(address,address)
           handler: handleWhitelistGuardianSet
+    network: kovan
   - kind: ethereum/contract
     name: WhitePaperInterestRateModel
     source:
       abi: WhitePaperInterestRateModel
+      address: "0x0000000000000000000000000000000000000000"
+      startBlock: 32600000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -202,10 +221,13 @@ dataSources:
       eventHandlers:
         - event: NewInterestParams(uint256,uint256)
           handler: handleNewInterestParams
+    network: kovan
   - kind: ethereum/contract
     name: JumpRateModel
     source:
       abi: JumpRateModel
+      address: "0x0000000000000000000000000000000000000000"
+      startBlock: 32600000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -219,10 +241,13 @@ dataSources:
       eventHandlers:
         - event: NewInterestParams(uint256,uint256,uint256,uint256)
           handler: handleNewInterestParams
+    network: kovan
   - kind: ethereum/contract
     name: JumpRateModelV2
     source:
       abi: JumpRateModelV2
+      address: "0x0000000000000000000000000000000000000000"
+      startBlock: 32600000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -236,10 +261,13 @@ dataSources:
       eventHandlers:
         - event: NewInterestParams(uint256,uint256,uint256,uint256)
           handler: handleNewInterestParams
+    network: kovan
   - kind: ethereum/contract
     name: DAIInterestRateModelV3
     source:
       abi: DAIInterestRateModelV3
+      address: "0x0000000000000000000000000000000000000000"
+      startBlock: 32600000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -253,6 +281,7 @@ dataSources:
       eventHandlers:
         - event: NewInterestParams(uint256,uint256,uint256,uint256)
           handler: handleNewInterestParams
+    network: kovan
 templates:
   - name: CToken
     kind: ethereum/contract
@@ -268,6 +297,8 @@ templates:
       abis:
         - name: CToken
           file: ./abis/cToken.json
+        - name: ERC20
+          file: ./abis/erc20.json
       eventHandlers:
         - event: AccrueInterest(uint256,uint256,uint256,uint256)
           handler: handleAccrueInterest
@@ -299,3 +330,4 @@ templates:
           handler: handleTransfer
         - event: Approval(indexed address,indexed address,uint256)
           handler: handleApproval
+    network: kovan
