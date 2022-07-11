@@ -1,4 +1,4 @@
-import { BigDecimal, Bytes } from "@graphprotocol/graph-ts/index";
+import { BigDecimal, Bytes } from "@graphprotocol/graph-ts";
 import { AccountCToken } from "../types/schema";
 
 const zeroBD = BigDecimal.fromString("0");
@@ -28,7 +28,7 @@ export function updateCommonCTokenStats(
   accountID: string,
   txHash: Bytes,
   timestamp: i32,
-  blockNumber: i32,
+  blockNumber: i32
 ): AccountCToken {
   const cTokenStatsID = marketID.concat("-").concat(accountID);
   let cTokenStats = AccountCToken.load(cTokenStatsID);

@@ -4,10 +4,11 @@ import { Market } from "../../types/schema";
 import { mantissaFactorBD } from "../../utils";
 
 export function handleNewCollateralFactor(event: NewCollateralFactor): void {
-  const market = Market.load(event.params.cToken.toHexString());
+  const marketId = event.params.cToken.toHexString();
+  const market = Market.load(marketId);
 
   if (!market) {
-    log.info("Market({}) not found", [event.params.cToken.toHexString()]);
+    log.error("Comptroller ::: NewCollateralFactor ::: Market({}) not found", [marketId]);
     return;
   }
 

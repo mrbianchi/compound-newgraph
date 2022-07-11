@@ -1,4 +1,4 @@
-import { BigDecimal } from "@graphprotocol/graph-ts/index";
+import { BigDecimal } from "@graphprotocol/graph-ts";
 
 function exponentToBigDecimal(decimals: i32): BigDecimal {
   let bd = BigDecimal.fromString("1");

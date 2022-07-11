@@ -1,58 +1,45 @@
 import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { assert, beforeEach, clearStore, describe, newMockEvent, test } from "matchstick-as";
+import { NullAddress, NullAddressString } from "../../../src/constants";
 import { handleNewPriceOracle } from "../../../src/mappings/comptroller/newPriceOracleMapping";
 import { NewPriceOracle } from "../../../src/types/Comptroller/Comptroller";
-import { Comptroller } from "../../../src/types/schema";
+import { ComptrollerBuilder, ComptrollerDefaultValues } from "../../fixtures/comptrollerBuilder";
 
-function createNewPriceOracleEvent(oldPriceOracleAddress: string, newPriceOracleAddress: string): NewPriceOracle {
-  const newPriceOracleEvent = changetype<NewPriceOracle>(newMockEvent());
-  const oldPriceOracleAddressParam = new ethereum.EventParam(
-    "newPriceOracle",
-    ethereum.Value.fromAddress(Address.fromString(oldPriceOracleAddress)),
+function createEvent(): NewPriceOracle {
+  const event = changetype<NewPriceOracle>(newMockEvent());
+  event.parameters.push(new ethereum.EventParam("newPriceOracle", ethereum.Value.fromAddress(NullAddress)));
+  event.parameters.push(
+    new ethereum.EventParam(
+      "newPriceOracle",
+      ethereum.Value.fromAddress(Address.fromString(ComptrollerDefaultValues.PriceOracle))
+    )
   );
-  const newPriceOracleAddressParam = new ethereum.EventParam(
-    "newPriceOracle",
-    ethereum.Value.fromAddress(Address.fromString(newPriceOracleAddress)),
-  );
-
-  newPriceOracleEvent.parameters = [];
-  newPriceOracleEvent.parameters.push(oldPriceOracleAddressParam);
-  newPriceOracleEvent.parameters.push(newPriceOracleAddressParam);
-  return newPriceOracleEvent;
+  return event;
 }
 
-describe("handleNewPriceOracle tests", () => {
+describe("Comptroller ::: handleNewPriceOracle tests", () => {
   beforeEach(() => {
     clearStore();
   });
 
   test("It should create Comptroller with ID 1 if it doesn't exist", () => {
-    const newPriceOracleEvent = createNewPriceOracleEvent(
-      "0x0000000000000000000000000000000000000000",
-      "0x0000000000000000000000000000000000000001",
-    );
+    const event = createEvent();
 
     assert.entityCount("Comptroller", 0);
 
-    handleNewPriceOracle(newPriceOracleEvent);
+    handleNewPriceOracle(event);
 
     assert.entityCount("Comptroller", 1);
-    assert.fieldEquals("Comptroller", "1", "priceOracle", "0x0000000000000000000000000000000000000001");
+    assert.fieldEquals("Comptroller", ComptrollerDefaultValues.Id, "priceOracle", ComptrollerDefaultValues.PriceOracle);
   });
 
   test("It should update an existing Comptroller", () => {
-    const comptroller = new Comptroller("1");
-    comptroller.priceOracle = Address.fromString("0x0000000000000000000000000000000000000000");
-    comptroller.save();
+    const comptroller = new ComptrollerBuilder().withPriceOracle(NullAddressString).build();
+    const event = createEvent();
 
-    const newPriceOracleEvent = createNewPriceOracleEvent(
-      "0x0000000000000000000000000000000000000000",
-      "0x0000000000000000000000000000000000000001",
-    );
-
-    handleNewPriceOracle(newPriceOracleEvent);
+    handleNewPriceOracle(event);
 
     assert.entityCount("Comptroller", 1);
-    assert.fieldEquals("Comptroller", "1", "priceOracle", "0x0000000000000000000000000000000000000001");
+    assert.fieldEquals("Comptroller", comptroller.id, "priceOracle", ComptrollerDefaultValues.PriceOracle);
   });
 });

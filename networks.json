@@ -12,6 +12,10 @@
       "address": "0x6d903f6003cca6255D85CcA4D3B5E5146dC33925",
       "startBlock": 8722894
     },
+    "cEther": {
+      "address": "0xc00e94Cb662C3520282E6f5717214004A7f26888",
+      "startBlock": 9601358
+    },
     "Comp": {
       "address": "0xc00e94Cb662C3520282E6f5717214004A7f26888",
       "startBlock": 9601358
