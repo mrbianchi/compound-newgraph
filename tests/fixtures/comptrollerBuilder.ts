@@ -4,7 +4,7 @@ import { Comptroller } from "../../src/types/schema";
 
 export abstract class ComptrollerDefaultValues {
   public static readonly Id: string = DefaultComptrollerId;
-  public static readonly PriceOracle: string = "0x0000000000000000000000000000000000000001";
+  public static readonly PriceOracle: string = "0xfafafa0000000000000000000000000000000001";
   public static readonly LiquidationIncentive: u64 = 13;
   public static readonly CloseFactor: u64 = 45;
 }

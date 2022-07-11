@@ -5,10 +5,10 @@ import { Proposal } from "../../src/types/schema";
 export abstract class ProposalDefaultValues {
   public static readonly Id: string = "1";
   public static readonly Status: string = ProposalStatuses.Active;
-  public static readonly Proposer: string = "0x0000000000000000000000000000000000000001";
+  public static readonly Proposer: string = "0xfafafa0000000000000000000000000000000001";
   public static readonly Targets: string[] = [
-    "0x0000000000000000000000000000000000000002",
-    "0x0000000000000000000000000000000000000003",
+    "0xfafafa0000000000000000000000000000000002",
+    "0xfafafa0000000000000000000000000000000003",
   ];
   public static readonly Values: u64[] = [12321, 4326];
   public static readonly Signatures: string[] = ["aSignature1", "aSignature2"];

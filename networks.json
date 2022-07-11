@@ -24,10 +24,6 @@
       "address": "0xc0Da02939E1441F497fd74F78cE7Decb17B66529",
       "startBlock": 12006098
     },
-    "GovernorAlpha": {
-      "address": "0xc0da01a04c3f3e0be433606045bb7017a7323e38",
-      "startBlock": 9601458
-    },
     "WhitePaperInterestRateModel": {
       "address": "0xD928c8eAD620Bb316D2cEfe3CAF81dC2dec6Ff63",
       "startBlock": 8182677
@@ -58,15 +54,15 @@
       "address": "0x0000000000000000000000000000000000000000",
       "startBlock": 32600000
     },
+    "cEther": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "startBlock": 32600000
+    },
     "Comp": {
       "address": "0x0000000000000000000000000000000000000000",
       "startBlock": 32600000
     },
     "GovernorBravoDelegator": {
-      "address": "0x0000000000000000000000000000000000000000",
-      "startBlock": 32600000
-    },
-    "GovernorAlpha": {
       "address": "0x0000000000000000000000000000000000000000",
       "startBlock": 32600000
     },

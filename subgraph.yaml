@@ -55,6 +55,10 @@ dataSources:
           file: ./abis/priceOracle.json
         - name: ERC20
           file: ./abis/erc20.json
+        - name: cEther
+          file: ./abis/cEther.json
+        - name: cERC20Delegator
+          file: ./abis/cERC20Delegator.json
       eventHandlers:
         - event: Failure(uint256,uint256,uint256)
           handler: handleFailure
@@ -299,6 +303,10 @@ templates:
           file: ./abis/cToken.json
         - name: ERC20
           file: ./abis/erc20.json
+        - name: cEther
+          file: ./abis/cEther.json
+        - name: cERC20Delegator
+          file: ./abis/cERC20Delegator.json
       eventHandlers:
         - event: AccrueInterest(uint256,uint256,uint256,uint256)
           handler: handleAccrueInterest
