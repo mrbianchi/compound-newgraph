@@ -1,9 +1,9 @@
-import { Address, BigDecimal, BigInt, log, dataSource } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, dataSource, log } from "@graphprotocol/graph-ts";
 import { MarketListed } from "../../types/Comptroller/Comptroller";
+import { ERC20 } from "../../types/Comptroller/ERC20";
 import { Market } from "../../types/schema";
 import { CToken } from "../../types/templates";
 import { CToken as CTokenTemplate } from "../../types/templates/CToken/CToken";
-import { ERC20 } from "../../types/Comptroller/ERC20";
 
 const network = dataSource.network();
 

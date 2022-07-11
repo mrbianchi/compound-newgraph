@@ -18,7 +18,7 @@ export function handleMarketExited(event: MarketExited): void {
     accountID,
     event.transaction.hash,
     event.block.timestamp.toI32(),
-    event.block.number.toI32(),
+    event.block.number.toI32()
   );
   cTokenStats.enteredMarket = false;
   cTokenStats.save();
