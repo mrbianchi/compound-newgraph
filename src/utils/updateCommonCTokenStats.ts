@@ -1,46 +1,44 @@
-import { BigDecimal, Bytes } from "@graphprotocol/graph-ts";
+import { Bytes, ethereum } from "@graphprotocol/graph-ts";
+import { ZeroBD, ZeroBI } from "../constants";
 import { AccountCToken } from "../types/schema";
 
-const zeroBD = BigDecimal.fromString("0");
-
-function createAccountCToken(cTokenStatsID: string, symbol: string, account: string, marketID: string): AccountCToken {
-  const cTokenStats = new AccountCToken(cTokenStatsID);
+function createAccountCToken(cTokenStatsId: string, symbol: string, account: string, marketId: string): AccountCToken {
+  const cTokenStats = new AccountCToken(cTokenStatsId);
   cTokenStats.symbol = symbol;
-  cTokenStats.market = marketID;
+  cTokenStats.market = marketId;
   cTokenStats.account = account;
   cTokenStats.transactionHashes = [];
   cTokenStats.transactionTimes = [];
-  cTokenStats.accrualBlockNumber = 0;
-  cTokenStats.cTokenBalance = zeroBD;
-  cTokenStats.totalUnderlyingSupplied = zeroBD;
-  cTokenStats.totalUnderlyingRedeemed = zeroBD;
-  cTokenStats.accountBorrowIndex = zeroBD;
-  cTokenStats.totalUnderlyingBorrowed = zeroBD;
-  cTokenStats.totalUnderlyingRepaid = zeroBD;
-  cTokenStats.storedBorrowBalance = zeroBD;
+  cTokenStats.accrualBlockNumber = ZeroBI;
+  cTokenStats.cTokenBalance = ZeroBD;
+  cTokenStats.totalUnderlyingSupplied = ZeroBD;
+  cTokenStats.totalUnderlyingRedeemed = ZeroBD;
+  cTokenStats.accountBorrowIndex = ZeroBD;
+  cTokenStats.totalUnderlyingBorrowed = ZeroBD;
+  cTokenStats.totalUnderlyingRepaid = ZeroBD;
+  cTokenStats.storedBorrowBalance = ZeroBD;
   cTokenStats.enteredMarket = false;
   return cTokenStats;
 }
 
 export function updateCommonCTokenStats(
-  marketID: string,
+  marketId: string,
   marketSymbol: string,
-  accountID: string,
+  accountId: string,
   txHash: Bytes,
-  timestamp: i32,
-  blockNumber: i32
+  block: ethereum.Block
 ): AccountCToken {
-  const cTokenStatsID = marketID.concat("-").concat(accountID);
-  let cTokenStats = AccountCToken.load(cTokenStatsID);
+  const cTokenStatsId = marketId.concat("-").concat(accountId);
+  let cTokenStats = AccountCToken.load(cTokenStatsId);
   if (cTokenStats == null) {
-    cTokenStats = createAccountCToken(cTokenStatsID, marketSymbol, accountID, marketID);
+    cTokenStats = createAccountCToken(cTokenStatsId, marketSymbol, accountId, marketId);
   }
   const txHashes = cTokenStats.transactionHashes;
   txHashes.push(txHash);
   cTokenStats.transactionHashes = txHashes;
   const txTimes = cTokenStats.transactionTimes;
-  txTimes.push(timestamp);
+  txTimes.push(block.timestamp);
   cTokenStats.transactionTimes = txTimes;
-  cTokenStats.accrualBlockNumber = blockNumber;
+  cTokenStats.accrualBlockNumber = block.number;
   return cTokenStats as AccountCToken;
 }

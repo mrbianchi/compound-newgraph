@@ -6,6 +6,7 @@ export function getComptroller(): Comptroller {
 
   if (!comptroller) {
     comptroller = new Comptroller(DefaultComptrollerId);
+    comptroller.save();
   }
 
   return comptroller;

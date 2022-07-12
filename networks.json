@@ -16,6 +16,10 @@
       "address": "0xc00e94Cb662C3520282E6f5717214004A7f26888",
       "startBlock": 9601358
     },
+    "cUSDC": {
+      "address": "0x39AA39c021dfbaE8faC545936693aC917d5E7563",
+      "startBlock": 7710760
+    },
     "Comp": {
       "address": "0xc00e94Cb662C3520282E6f5717214004A7f26888",
       "startBlock": 9601358
@@ -55,6 +59,10 @@
       "startBlock": 32600000
     },
     "cEther": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "startBlock": 32600000
+    },
+    "cUSDC": {
       "address": "0x0000000000000000000000000000000000000000",
       "startBlock": 32600000
     },

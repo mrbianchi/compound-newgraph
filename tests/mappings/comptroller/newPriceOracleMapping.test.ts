@@ -22,7 +22,7 @@ describe("Comptroller ::: handleNewPriceOracle tests", () => {
     clearStore();
   });
 
-  test("It should create Comptroller with ID 1 if it doesn't exist", () => {
+  test("It should create Comptroller with Id 1 if it doesn't exist", () => {
     const event = createEvent();
 
     assert.entityCount("Comptroller", 0);

@@ -29,9 +29,9 @@ type Market @entity { # TODO rename to CToken, not market AND ALL OTHERS
     "Name of the cToken"
     name: String!
     "Number of borrowers active in the market"
-    numberOfBorrowers: Int!
+    numberOfBorrowers: BigInt!
     "Number of suppliers active in the market"
-    numberOfSuppliers: Int!
+    numberOfSuppliers: BigInt!
     "Reserves stored in the contract"
     reserves: BigDecimal!
     "Yearly supply rate. With 2104400 blocks per year"
@@ -53,9 +53,9 @@ type Market @entity { # TODO rename to CToken, not market AND ALL OTHERS
 
     # Fields that are not in compounds api
     "Block the market is updated to"
-    accrualBlockNumber: Int!
+    accrualBlockNumber: BigInt!
     "Timestamp the market was most recently updated"
-    blockTimestamp: Int!
+    blockTimestamp: BigInt!
     "The history of the markets borrow index return (Think S&P 500)"
     borrowIndex: BigDecimal!
     "The factor determining interest that goes to reserves"
@@ -73,9 +73,9 @@ type Account @entity {
     "Array of CTokens user is in"
     tokens: [AccountCToken!]! @derivedFrom(field: "account")
     "Count user has been liquidated"
-    countLiquidated: Int!
+    countLiquidated: BigInt!
     "Count user has liquidated others"
-    countLiquidator: Int!
+    countLiquidator: BigInt!
     "True if user has ever borrowed"
     hasBorrowed: Boolean!
 
@@ -104,9 +104,9 @@ type AccountCToken @entity {
     "Hashes of all user transactions"
     transactionHashes: [Bytes!]!
     "Times of all user transactions"
-    transactionTimes: [Int!]!
+    transactionTimes: [BigInt!]!
     "Block number this asset was updated at in the contract"
-    accrualBlockNumber: Int!
+    accrualBlockNumber: BigInt!
     "True if user is entered, false if they are exited"
     enteredMarket: Boolean!
 

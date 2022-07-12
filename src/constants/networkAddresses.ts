@@ -2,6 +2,7 @@ export const UnitrollerAddress = "0xfafafa0000000000000000000000000000000000";
 export const ComptrollerAddress = "0xfafafa0000000000000000000000000000000000";
 export const TimelockAddress = "0xfafafa0000000000000000000000000000000000";
 export const cEtherAddress = "0xfafafa0000000000000000000000000000000000";
+export const cUSDCAddress = "0xfafafa0000000000000000000000000000000000";
 export const CompAddress = "0xfafafa0000000000000000000000000000000000";
 export const GovernorBravoDelegatorAddress = "0xfafafa0000000000000000000000000000000000";
 export const WhitePaperInterestRateModelAddress = "0xfafafa0000000000000000000000000000000000";

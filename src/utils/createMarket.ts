@@ -1,5 +1,5 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { NullAddress, ZeroBD, cEtherAddress } from "../constants";
+import { Address, BigDecimal } from "@graphprotocol/graph-ts";
+import { NullAddress, ZeroBD, ZeroBI, cEtherAddress } from "../constants";
 import { ERC20 } from "../types/Comptroller/ERC20";
 import { cERC20Delegator } from "../types/Comptroller/cERC20Delegator";
 import { cEther } from "../types/Comptroller/cEther";
@@ -12,17 +12,17 @@ function fillCommonMarket(market: Market): void {
   market.collateralFactor = ZeroBD;
   market.exchangeRate = ZeroBD;
   market.interestRateModelAddress = NullAddress;
-  market.numberOfBorrowers = 0;
-  market.numberOfSuppliers = 0;
+  market.numberOfBorrowers = ZeroBI;
+  market.numberOfSuppliers = ZeroBI;
   market.reserves = ZeroBD;
   market.supplyRate = ZeroBD;
   market.totalBorrows = ZeroBD;
   market.totalSupply = ZeroBD;
   market.underlyingPrice = ZeroBD;
-  market.accrualBlockNumber = 0;
-  market.blockTimestamp = 0;
+  market.accrualBlockNumber = ZeroBI;
+  market.blockTimestamp = ZeroBI;
   market.borrowIndex = ZeroBD;
-  market.reserveFactor = BigInt.zero();
+  market.reserveFactor = ZeroBI;
   market.underlyingPriceUSD = ZeroBD;
   market.underlyingAddress = NullAddress;
   market.underlyingDecimals = 0;
@@ -56,6 +56,14 @@ function fillERC20Market(market: Market): void {
   market.interestRateModelAddress = contract.interestRateModel();
   market.reserveFactor = contract.reserveFactorMantissa();
   market.underlyingDecimals = underlyingContract.decimals();
+
+  ///if (market.underlyingAddress.toHexString() == daiAddress) {
+  //  market.underlyingName = "Dai Stablecoin v1.0 (DAI)";
+  //  market.underlyingSymbol = "DAI";
+  //}
+  //if (marketAddress == cUSDCAddress) {
+  //  market.underlyingPriceUSD = BigDecimal.fromString("1");
+  //}
 }
 
 export function createMarket(marketId: string): Market {
@@ -67,10 +75,13 @@ export function createMarket(marketId: string): Market {
   fillCommonMarket(market);
 
   if (marketId == cEtherAddress) {
+    // It is CETH, which has a slightly different interface
     fillEtherMarket(market);
   } else {
+    // It is all other CERC20 contracts
     fillERC20Market(market);
   }
 
+  market.save();
   return market;
 }
