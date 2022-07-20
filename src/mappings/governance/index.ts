@@ -1,6 +1,3 @@
-export * from "./newAdminMapping";
-export * from "./newImplementationMapping";
-export * from "./newPendingAdminMapping";
 export * from "./proposalCanceledMapping";
 export * from "./proposalCreatedMapping";
 export * from "./proposalExecutedMapping";

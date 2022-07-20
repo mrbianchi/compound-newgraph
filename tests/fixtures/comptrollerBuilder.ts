@@ -4,22 +4,28 @@ import { Comptroller } from "../../src/types/schema";
 
 export abstract class ComptrollerDefaultValues {
   public static readonly Id: string = DefaultComptrollerId;
-  public static readonly PriceOracle: string = "0xfafafa0000000000000000000000000000000001";
-  public static readonly LiquidationIncentive: u64 = 13;
-  public static readonly CloseFactor: u64 = 45;
+  public static readonly PriceOracleAddress: string = "0xfafafa0000000000000000000000000000000001";
+  public static readonly LiquidationIncentiveMantissa: u64 = 13;
+  public static readonly CloseFactorMantissa: u64 = 45;
+  public static readonly TransfersPaused: boolean = false;
+  public static readonly SeizesPaused: boolean = false;
 }
 
 export class ComptrollerBuilder {
   private id: string = ComptrollerDefaultValues.Id;
-  private priceOracle: string = ComptrollerDefaultValues.PriceOracle;
-  private liquidationIncentive: u64 = ComptrollerDefaultValues.LiquidationIncentive;
-  private closeFactor: u64 = ComptrollerDefaultValues.CloseFactor;
+  private priceOracleAddress: string = ComptrollerDefaultValues.PriceOracleAddress;
+  private liquidationIncentiveMantissa: u64 = ComptrollerDefaultValues.LiquidationIncentiveMantissa;
+  private closeFactorMantissa: u64 = ComptrollerDefaultValues.CloseFactorMantissa;
+  private transfersPaused: boolean = ComptrollerDefaultValues.TransfersPaused;
+  private seizesPaused: boolean = ComptrollerDefaultValues.SeizesPaused;
 
   build(): Comptroller {
     const entity = new Comptroller(this.id);
-    entity.priceOracle = Bytes.fromHexString(this.priceOracle);
-    entity.liquidationIncentive = BigInt.fromU64(this.liquidationIncentive);
-    entity.closeFactor = BigInt.fromU64(this.closeFactor);
+    entity.priceOracleAddress = Bytes.fromHexString(this.priceOracleAddress);
+    entity.liquidationIncentiveMantissa = BigInt.fromU64(this.liquidationIncentiveMantissa);
+    entity.closeFactorMantissa = BigInt.fromU64(this.closeFactorMantissa);
+    entity.transfersPaused = this.transfersPaused;
+    entity.seizesPaused = this.seizesPaused;
     entity.save();
     return entity;
   }
@@ -29,18 +35,28 @@ export class ComptrollerBuilder {
     return this;
   }
 
-  withPriceOracle(priceOracle: string): ComptrollerBuilder {
-    this.priceOracle = priceOracle;
+  withPriceOracleAddress(priceOracleAddress: string): ComptrollerBuilder {
+    this.priceOracleAddress = priceOracleAddress;
     return this;
   }
 
-  withLiquidationIncentive(liquidationIncentive: u64): ComptrollerBuilder {
-    this.liquidationIncentive = liquidationIncentive;
+  withLiquidationIncentiveMantissa(liquidationIncentiveMantissa: u64): ComptrollerBuilder {
+    this.liquidationIncentiveMantissa = liquidationIncentiveMantissa;
     return this;
   }
 
-  withCloseFactor(closeFactor: u64): ComptrollerBuilder {
-    this.closeFactor = closeFactor;
+  withCloseFactorMantissa(closeFactorMantissa: u64): ComptrollerBuilder {
+    this.closeFactorMantissa = closeFactorMantissa;
+    return this;
+  }
+
+  withTransfersPaused(transfersPaused: boolean): ComptrollerBuilder {
+    this.transfersPaused = transfersPaused;
+    return this;
+  }
+
+  withSeizesPaused(seizesPaused: boolean): ComptrollerBuilder {
+    this.seizesPaused = seizesPaused;
     return this;
   }
 }

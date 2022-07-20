@@ -1,5 +1,7 @@
-import { log } from "@graphprotocol/graph-ts";
+import { CTokenDecimals, CTokenDecimalsBD } from "../../constants";
+import { RedeemEvent } from "../../types/schema";
 import { Redeem } from "../../types/templates/CToken/CToken";
+import { exponentToBigDecimal, getMarket } from "../../utils";
 
 /*  Account supplies cTokens into market and receives underlying asset in exchange
  *
@@ -13,11 +15,24 @@ import { Redeem } from "../../types/templates/CToken/CToken";
  *    No need to updateCommonCTokenStats, handleTransfer() will
  *    No need to update cTokenBalance, handleTransfer() will
  */
-// Currently not in use. Everything can be done in handleTransfer, since a Redeem event
-// is always done alongside a Transfer event, with the same data
 export function handleRedeem(event: Redeem): void {
-  log.info("Redeem event handled", []);
-  log.info("param redeemer: {}", [event.params.redeemer.toHexString()]);
-  log.info("param redeemAmount: {}", [event.params.redeemAmount.toString()]);
-  log.info("param redeemTokens: {}", [event.params.redeemTokens.toString()]);
+  const marketId = event.address.toHexString();
+  const market = getMarket(marketId);
+
+  const redeemEventId = event.transaction.hash.toHexString().concat("-").concat(event.transactionLogIndex.toString());
+  const cTokenAmount = event.params.redeemTokens.toBigDecimal().div(CTokenDecimalsBD).truncate(CTokenDecimals);
+  const underlyingAmount = event.params.redeemAmount
+    .toBigDecimal()
+    .div(exponentToBigDecimal(market.underlyingDecimals))
+    .truncate(market.underlyingDecimals);
+
+  const redeemEvent = new RedeemEvent(redeemEventId);
+  redeemEvent.market = marketId;
+  redeemEvent.amount = cTokenAmount;
+  redeemEvent.to = event.address;
+  redeemEvent.from = event.params.redeemer;
+  redeemEvent.blockNumber = event.block.number;
+  redeemEvent.blockTime = event.block.timestamp;
+  redeemEvent.underlyingAmount = underlyingAmount;
+  redeemEvent.save();
 }

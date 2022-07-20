@@ -1,10 +1,9 @@
 import { Address, BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
-import { CTokenDecimalsBD, MantissaFactor, MantissaFactorBD, ZeroBD, cEtherAddress, cUSDCAddress } from "../constants";
+import { CTokenDecimalsBD, MantissaFactor, MantissaFactorBD, ZeroBD, cEtherAddress } from "../constants";
 import { Market } from "../types/schema";
 import { CToken } from "../types/templates/CToken/CToken";
 import { exponentToBigDecimal } from "./exponentToBigDecimal";
 import { getTokenPrice } from "./getTokenPrice";
-import { getUSDCpriceETH } from "./getUSDCpriceETH";
 
 function updateCommonMarket(market: Market, block: ethereum.Block): void {
   const contractAddress = Address.fromString(market.id);
@@ -72,36 +71,35 @@ function updateCommonMarket(market: Market, block: ethereum.Block): void {
 }
 
 function updateEtherMarket(market: Market): void {
-  const usdPriceInEth = getUSDCpriceETH();
-  market.underlyingPriceUSD = market.underlyingPrice.div(usdPriceInEth).truncate(market.underlyingDecimals);
+  const contractAddress = Address.fromString(market.id);
+  const tokenPriceUSD = getTokenPrice(contractAddress, market.underlyingDecimals);
+  //market.underlyingPrice = BigDecimal.fromString("1");
+  market.underlyingPriceUSD = tokenPriceUSD.truncate(market.underlyingDecimals); //market.underlyingPrice.div(usdPriceInEth).truncate(market.underlyingDecimals);
 }
 
 function updateERC20Market(market: Market): void {
   const contractAddress = Address.fromString(market.id);
-  const usdPriceInEth = getUSDCpriceETH();
-  const tokenPriceEth = getTokenPrice(contractAddress, market.underlyingDecimals);
-  market.underlyingPrice = tokenPriceEth.truncate(market.underlyingDecimals);
-
-  // if USDC, we only update ETH price
-  if (market.id != cUSDCAddress) {
-    market.underlyingPriceUSD = market.underlyingPrice.div(usdPriceInEth).truncate(market.underlyingDecimals);
-  }
+  const tokenPriceUSD = getTokenPrice(contractAddress, market.underlyingDecimals);
+  market.underlyingPriceETH = tokenPriceUSD.truncate(market.underlyingDecimals);
+  market.underlyingPriceUSD = tokenPriceUSD.truncate(market.underlyingDecimals);
 }
 
 export function updateMarket(market: Market, block: ethereum.Block): Market {
   // Only updateMarket if it has not been updated this block
-  if (market.accrualBlockNumber != block.number) {
-    updateCommonMarket(market, block);
-
-    if (market.id == cEtherAddress) {
-      // if cETH, we only update USD price
-      updateEtherMarket(market);
-    } else {
-      updateERC20Market(market);
-    }
-
-    market.save();
+  if (market.accrualBlockNumber == block.number) {
+    return market;
   }
+
+  updateCommonMarket(market, block);
+
+  if (market.id == cEtherAddress) {
+    // if cETH, we only update USD price
+    updateEtherMarket(market);
+  } else {
+    updateERC20Market(market);
+  }
+
+  market.save();
 
   return market;
 }

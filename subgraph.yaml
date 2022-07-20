@@ -5,39 +5,9 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: Unitroller
-    source:
-      abi: Unitroller
-      address: "0xf1a1dFAefabA7d23CE64CCED4d32f72ed7c24Cbe"
-      startBlock: 31944840
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      file: ./src/mappings/unitroller/index.ts
-      entities:
-        - Unitroller
-      abis:
-        - name: Unitroller
-          file: ./abis/unitroller.json
-      eventHandlers:
-        - event: Failure(uint256,uint256,uint256)
-          handler: handleFailure
-        - event: NewPendingImplementation(address,address)
-          handler: handleNewPendingImplementation
-        - event: NewImplementation(address,address)
-          handler: handleNewImplementation
-        - event: NewPendingAdmin(address,address)
-          handler: handleNewPendingAdmin
-        - event: NewAdmin(address,address)
-          handler: NewAdmin
-    network: kovan
-  - kind: ethereum/contract
     name: Comptroller
     source:
       abi: Comptroller
-      address: "0xf1a1dFAefabA7d23CE64CCED4d32f72ed7c24Cbe"
-      startBlock: 31944840
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -76,8 +46,6 @@ dataSources:
           handler: handleNewLiquidationIncentive
         - event: NewPriceOracle(address,address)
           handler: handleNewPriceOracle
-        - event: NewPauseGuardian(address,address)
-          handler: handleNewPauseGuardian
         - event: ActionPaused(string,bool)
           handler: handleGloballyActionPaused
         - event: ActionPaused(address,string,bool)
@@ -86,62 +54,16 @@ dataSources:
           handler: handleCompBorrowSpeedUpdated
         - event: CompSupplySpeedUpdated(indexed address,uint256)
           handler: handleCompSupplySpeedUpdated
-        - event: ContributorCompSpeedUpdated(indexed address,uint256)
-          handler: handleContributorCompSpeedUpdated
         - event: DistributedSupplierComp(indexed address,indexed address,uint256,uint256)
           handler: handleDistributedSupplierComp
         - event: DistributedBorrowerComp(indexed address,indexed address,uint256,uint256)
           handler: handleDistributedBorrowerComp
         - event: NewBorrowCap(indexed address,uint256)
           handler: handleNewBorrowCap
-        - event: NewBorrowCapGuardian(address,address)
-          handler: handleNewBorrowCapGuardian
-        - event: CompGranted(address,uint256)
-          handler: handleCompGranted
-        - event: CompAccruedAdjusted(indexed address,uint256,uint256)
-          handler: handleCompAccruedAdjusted
-        - event: CompReceivableUpdated(indexed address,uint256,uint256)
-          handler: handleCompReceivableUpdated
-    network: kovan
-  - kind: ethereum/contract
-    name: Timelock
-    source:
-      abi: Timelock
-      address: "0x0000000000000000000000000000000000000000"
-      startBlock: 32600000
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      file: ./src/mappings/timeLock/index.ts
-      entities:
-        - Timelock
-      abis:
-        - name: Timelock
-          file: ./abis/timelock.json
-      eventHandlers:
-        - event: NewAdmin(indexed address)
-          handler: handleNewAdmin
-        - event: NewPendingAdmin(indexed address)
-          handler: handleNewPendingAdmin
-        - event: NewDelay(indexed uint256)
-          handler: handleNewDelay
-        - event: CancelTransaction(indexed bytes32,indexed
-            address,uint256,string,bytes,uint256)
-          handler: handleCancelTransaction
-        - event: ExecuteTransaction(indexed bytes32,indexed
-            address,uint256,string,bytes,uint256)
-          handler: handleExecuteTransaction
-        - event: QueueTransaction(indexed bytes32,indexed
-            address,uint256,string,bytes,uint256)
-          handler: handleQueueTransaction
-    network: kovan
   - kind: ethereum/contract
     name: Comp
     source:
       abi: Comp
-      address: "0x0000000000000000000000000000000000000000"
-      startBlock: 32600000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -161,13 +83,10 @@ dataSources:
           handler: handleTransfer
         - event: Approval(indexed address,indexed address,uint256)
           handler: handleApproval
-    network: kovan
   - kind: ethereum/contract
     name: GovernorBravoDelegator
     source:
       abi: GovernorBravoDelegator
-      address: "0x0000000000000000000000000000000000000000"
-      startBlock: 32600000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -193,99 +112,12 @@ dataSources:
           handler: handleVotingDelaySet
         - event: VotingPeriodSet(uint256,uint256)
           handler: handleVotingPeriodSet
-        - event: NewImplementation(address,address)
-          handler: handleNewImplementation
         - event: ProposalThresholdSet(uint256,uint256)
           handler: handleProposalThresholdSet
-        - event: NewPendingAdmin(address,address)
-          handler: handleNewPendingAdmin
-        - event: NewAdmin(address,address)
-          handler: handleNewAdmin
         - event: WhitelistAccountExpirationSet(address,uint256)
           handler: handleWhitelistAccountExpirationSet
         - event: WhitelistGuardianSet(address,address)
           handler: handleWhitelistGuardianSet
-    network: kovan
-  - kind: ethereum/contract
-    name: WhitePaperInterestRateModel
-    source:
-      abi: WhitePaperInterestRateModel
-      address: "0x0000000000000000000000000000000000000000"
-      startBlock: 32600000
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      file: ./src/mappings/interestRateModels/whitePaper/index.ts
-      entities:
-        - WhitePaperInterestRateModel
-      abis:
-        - name: WhitePaperInterestRateModel
-          file: ./abis/whitePaperInterestRateModel.json
-      eventHandlers:
-        - event: NewInterestParams(uint256,uint256)
-          handler: handleNewInterestParams
-    network: kovan
-  - kind: ethereum/contract
-    name: JumpRateModel
-    source:
-      abi: JumpRateModel
-      address: "0x0000000000000000000000000000000000000000"
-      startBlock: 32600000
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      file: ./src/mappings/interestRateModels/jump/index.ts
-      entities:
-        - JumpRateModel
-      abis:
-        - name: JumpRateModel
-          file: ./abis/jumpRateModel.json
-      eventHandlers:
-        - event: NewInterestParams(uint256,uint256,uint256,uint256)
-          handler: handleNewInterestParams
-    network: kovan
-  - kind: ethereum/contract
-    name: JumpRateModelV2
-    source:
-      abi: JumpRateModelV2
-      address: "0x0000000000000000000000000000000000000000"
-      startBlock: 32600000
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      file: ./src/mappings/interestRateModels/jumpV2/index.ts
-      entities:
-        - JumpRateModelV2
-      abis:
-        - name: JumpRateModelV2
-          file: ./abis/jumpRateModelV2.json
-      eventHandlers:
-        - event: NewInterestParams(uint256,uint256,uint256,uint256)
-          handler: handleNewInterestParams
-    network: kovan
-  - kind: ethereum/contract
-    name: DAIInterestRateModelV3
-    source:
-      abi: DAIInterestRateModelV3
-      address: "0x0000000000000000000000000000000000000000"
-      startBlock: 32600000
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      file: ./src/mappings/interestRateModels/dai/index.ts
-      entities:
-        - DAIInterestRateModelV3
-      abis:
-        - name: DAIInterestRateModelV3
-          file: ./abis/DAIInterestRateModelV3.json
-      eventHandlers:
-        - event: NewInterestParams(uint256,uint256,uint256,uint256)
-          handler: handleNewInterestParams
-    network: kovan
 templates:
   - name: CToken
     kind: ethereum/contract
@@ -307,6 +139,8 @@ templates:
           file: ./abis/cEther.json
         - name: cERC20Delegator
           file: ./abis/cERC20Delegator.json
+        - name: PriceOracle
+          file: ./abis/priceOracle.json
       eventHandlers:
         - event: AccrueInterest(uint256,uint256,uint256,uint256)
           handler: handleAccrueInterest
@@ -320,22 +154,9 @@ templates:
           handler: handleRepayBorrow
         - event: LiquidateBorrow(address,address,uint256,address,uint256)
           handler: handleLiquidateBorrow
-        - event: NewPendingAdmin(address,address)
-          handler: handleNewPendingAdmin
-        - event: NewAdmin(address,address)
-          handler: handleNewAdmin
-        - event: NewComptroller(address,address)
-          handler: handleNewComptroller
         - event: NewMarketInterestRateModel(address,address)
           handler: handleNewMarketInterestRateModel
         - event: NewReserveFactor(uint256,uint256)
           handler: handleNewReserveFactor
-        - event: ReservesAdded(address,uint256,uint256)
-          handler: handleReservesAdded
-        - event: ReservesReduced(address,uint256,uint256)
-          handler: handleReservesReduced
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApproval
-    network: kovan

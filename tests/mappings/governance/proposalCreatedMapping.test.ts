@@ -35,10 +35,13 @@ function createEvent(): ProposalCreated {
     )
   );
   event.parameters.push(
-    new ethereum.EventParam("startBlock", ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(ProposalDefaultValues.StartBlock)))
+    new ethereum.EventParam(
+      "startBlock",
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(ProposalDefaultValues.StartBlockNumber))
+    )
   );
   event.parameters.push(
-    new ethereum.EventParam("endBlock", ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(ProposalDefaultValues.EndBlock)))
+    new ethereum.EventParam("endBlock", ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(ProposalDefaultValues.EndBlockNumber)))
   );
   event.parameters.push(new ethereum.EventParam("description", ethereum.Value.fromString(ProposalDefaultValues.Description)));
   return event;
@@ -63,8 +66,13 @@ describe("Governance ::: handleProposalCreated tests", () => {
     assert.fieldEquals("Proposal", ProposalDefaultValues.Id, "values", arrayToString(ProposalDefaultValues.Values));
     assert.fieldEquals("Proposal", ProposalDefaultValues.Id, "signatures", arrayToString(ProposalDefaultValues.Signatures));
     assert.fieldEquals("Proposal", ProposalDefaultValues.Id, "calldatas", arrayToString(ProposalDefaultValues.CallDatas));
-    assert.fieldEquals("Proposal", ProposalDefaultValues.Id, "startBlock", ProposalDefaultValues.StartBlock.toString());
-    assert.fieldEquals("Proposal", ProposalDefaultValues.Id, "endBlock", ProposalDefaultValues.EndBlock.toString());
+    assert.fieldEquals(
+      "Proposal",
+      ProposalDefaultValues.Id,
+      "startBlockNumber",
+      ProposalDefaultValues.StartBlockNumber.toString()
+    );
+    assert.fieldEquals("Proposal", ProposalDefaultValues.Id, "endBlockNumber", ProposalDefaultValues.EndBlockNumber.toString());
     assert.fieldEquals("Proposal", ProposalDefaultValues.Id, "description", ProposalDefaultValues.Description);
   });
 });

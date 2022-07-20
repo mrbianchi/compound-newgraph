@@ -11,8 +11,8 @@ export function handleProposalCreated(event: ProposalCreated): void {
   proposal.values = event.params.values;
   proposal.signatures = event.params.signatures;
   proposal.calldatas = event.params.calldatas;
-  proposal.startBlock = event.params.startBlock;
-  proposal.endBlock = event.params.endBlock;
+  proposal.startBlockNumber = event.params.startBlock;
+  proposal.endBlockNumber = event.params.endBlock;
   proposal.description = event.params.description;
 
   proposal.save();

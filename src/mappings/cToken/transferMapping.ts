@@ -1,7 +1,15 @@
-import { BigInt } from "@graphprotocol/graph-ts";
+import { BigInt, log } from "@graphprotocol/graph-ts";
 import { CTokenDecimals, CTokenDecimalsBD, ZeroBD } from "../../constants";
+import { TransferEvent } from "../../types/schema";
 import { Transfer } from "../../types/templates/CToken/CToken";
-import { getAccount, getMarket, updateCommonCTokenStats, updateMarket } from "../../utils";
+import {
+  addTransactionToAccountMarket,
+  getAccount,
+  getAccountMarket,
+  getMarket,
+  isNonFunctionalMarket,
+  updateMarket,
+} from "../../utils";
 
 /* Transferring of cTokens
  *
@@ -24,6 +32,12 @@ export function handleTransfer(event: Transfer): void {
   const marketId = event.address.toHexString();
   const accountFromId = event.params.from.toHexString();
   const accountToId = event.params.to.toHexString();
+
+  if (isNonFunctionalMarket(marketId)) {
+    log.error("Non functional market {}", [marketId]);
+    return;
+  }
+
   let market = getMarket(marketId);
   market = updateMarket(market, event.block);
 
@@ -34,25 +48,20 @@ export function handleTransfer(event: Transfer): void {
   // If so, it is a mint, and we don't need to run these calculations
   if (accountFromId != marketId) {
     const accountFrom = getAccount(accountFromId);
+    const accountMarketFrom = getAccountMarket(accountFromId, marketId);
 
     // Update cTokenStats common for all events, and return the stats to update unique
     // values for each event
-    const cTokenStatsFrom = updateCommonCTokenStats(
-      market.id,
-      market.symbol,
-      accountFromId,
-      event.transaction.hash,
-      event.block
-    );
+    addTransactionToAccountMarket(accountMarketFrom, event.block, event.transaction, event.transactionLogIndex);
 
-    cTokenStatsFrom.cTokenBalance = cTokenStatsFrom.cTokenBalance.minus(
+    accountMarketFrom.balance = accountMarketFrom.balance.minus(
       event.params.amount.toBigDecimal().div(CTokenDecimalsBD).truncate(CTokenDecimals)
     );
 
-    cTokenStatsFrom.totalUnderlyingRedeemed = cTokenStatsFrom.totalUnderlyingRedeemed.plus(amountUnderylingTruncated);
-    cTokenStatsFrom.save();
+    accountMarketFrom.totalUnderlyingRedeemed = accountMarketFrom.totalUnderlyingRedeemed.plus(amountUnderylingTruncated);
+    accountMarketFrom.save();
 
-    if (cTokenStatsFrom.cTokenBalance.equals(ZeroBD)) {
+    if (accountMarketFrom.balance.equals(ZeroBD)) {
       market.numberOfSuppliers = market.numberOfSuppliers.minus(BigInt.fromU64(1));
       market.save();
     }
@@ -66,18 +75,19 @@ export function handleTransfer(event: Transfer): void {
   // be messy to include, so we are leaving it out for now TODO fix this in future
   if (accountToId != marketId) {
     const accountTo = getAccount(accountToId);
+    const accountMarketTo = getAccountMarket(accountToId, marketId);
 
     // Update cTokenStats common for all events, and return the stats to update unique
     // values for each event
-    const cTokenStatsTo = updateCommonCTokenStats(market.id, market.symbol, accountToId, event.transaction.hash, event.block);
+    addTransactionToAccountMarket(accountMarketTo, event.block, event.transaction, event.transactionLogIndex);
 
-    const previousCTokenBalanceTo = cTokenStatsTo.cTokenBalance;
-    cTokenStatsTo.cTokenBalance = cTokenStatsTo.cTokenBalance.plus(
+    const previousCTokenBalanceTo = accountMarketTo.balance;
+    accountMarketTo.balance = accountMarketTo.balance.plus(
       event.params.amount.toBigDecimal().div(CTokenDecimalsBD).truncate(CTokenDecimals)
     );
 
-    cTokenStatsTo.totalUnderlyingSupplied = cTokenStatsTo.totalUnderlyingSupplied.plus(amountUnderylingTruncated);
-    cTokenStatsTo.save();
+    accountMarketTo.totalUnderlyingSupplied = accountMarketTo.totalUnderlyingSupplied.plus(amountUnderylingTruncated);
+    accountMarketTo.save();
 
     // checking edge case for transfers of 0
     if (previousCTokenBalanceTo.equals(ZeroBD) && !event.params.amount.toBigDecimal().equals(ZeroBD)) {
@@ -87,4 +97,14 @@ export function handleTransfer(event: Transfer): void {
 
     accountTo.save();
   }
+
+  const transferEventId = event.transaction.hash.toHexString().concat("-").concat(event.transactionLogIndex.toString());
+  const transferEvent = new TransferEvent(transferEventId);
+  transferEvent.market = marketId;
+  transferEvent.blockNumber = event.block.number;
+  transferEvent.blockTime = event.block.timestamp;
+  transferEvent.from = event.params.from;
+  transferEvent.to = event.params.to;
+  transferEvent.amount = event.params.amount.toBigDecimal().div(CTokenDecimalsBD);
+  transferEvent.save();
 }

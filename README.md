@@ -10,8 +10,8 @@
 
 ```bash
 $ yarn
-$ yarn run codegen
-$ yarn run build --network <network name>
-$ yarn run create-local
-$ yarn run deploy-local
+$ yarn codegen
+$ yarn build --network <network name>
+$ yarn create-local
+$ yarn deploy-local
 ```

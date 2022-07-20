@@ -12,7 +12,7 @@ function createEvent(): NewCloseFactor {
   event.parameters.push(
     new ethereum.EventParam(
       "newCloseFactorMantissa",
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(ComptrollerDefaultValues.CloseFactor))
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(ComptrollerDefaultValues.CloseFactorMantissa))
     )
   );
   return event;
@@ -34,18 +34,23 @@ describe("Comptroller ::: handleNewCloseFactor tests", () => {
     assert.fieldEquals(
       "Comptroller",
       ComptrollerDefaultValues.Id,
-      "closeFactor",
-      ComptrollerDefaultValues.CloseFactor.toString()
+      "closeFactorMantissa",
+      ComptrollerDefaultValues.CloseFactorMantissa.toString()
     );
   });
 
   test("It should update an existing Comptroller", () => {
-    const comptroller = new ComptrollerBuilder().withCloseFactor(0).build();
+    const comptroller = new ComptrollerBuilder().withCloseFactorMantissa(0).build();
     const event = createEvent();
 
     handleNewCloseFactor(event);
 
     assert.entityCount("Comptroller", 1);
-    assert.fieldEquals("Comptroller", comptroller.id, "closeFactor", ComptrollerDefaultValues.CloseFactor.toString());
+    assert.fieldEquals(
+      "Comptroller",
+      comptroller.id,
+      "closeFactorMantissa",
+      ComptrollerDefaultValues.CloseFactorMantissa.toString()
+    );
   });
 });

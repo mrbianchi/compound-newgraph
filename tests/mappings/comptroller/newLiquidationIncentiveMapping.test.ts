@@ -12,7 +12,7 @@ function createEvent(): NewLiquidationIncentive {
   event.parameters.push(
     new ethereum.EventParam(
       "newLiquidationIncentiveMantissa",
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(ComptrollerDefaultValues.LiquidationIncentive))
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(ComptrollerDefaultValues.LiquidationIncentiveMantissa))
     )
   );
   return event;
@@ -34,13 +34,13 @@ describe("Comptroller ::: handleNewLiquidationIncentive tests", () => {
     assert.fieldEquals(
       "Comptroller",
       ComptrollerDefaultValues.Id,
-      "liquidationIncentive",
-      ComptrollerDefaultValues.LiquidationIncentive.toString()
+      "liquidationIncentiveMantissa",
+      ComptrollerDefaultValues.LiquidationIncentiveMantissa.toString()
     );
   });
 
   test("It should update an existing Comptroller", () => {
-    const comptroller = new ComptrollerBuilder().withLiquidationIncentive(0).build();
+    const comptroller = new ComptrollerBuilder().withLiquidationIncentiveMantissa(0).build();
     const event = createEvent();
 
     handleNewLiquidationIncentive(event);
@@ -49,8 +49,8 @@ describe("Comptroller ::: handleNewLiquidationIncentive tests", () => {
     assert.fieldEquals(
       "Comptroller",
       comptroller.id,
-      "liquidationIncentive",
-      ComptrollerDefaultValues.LiquidationIncentive.toString()
+      "liquidationIncentiveMantissa",
+      ComptrollerDefaultValues.LiquidationIncentiveMantissa.toString()
     );
   });
 });

@@ -1,5 +1,7 @@
-import { log } from "@graphprotocol/graph-ts";
+import { CTokenDecimals, CTokenDecimalsBD } from "../../constants";
+import { MintEvent } from "../../types/schema";
 import { Mint } from "../../types/templates/CToken/CToken";
+import { exponentToBigDecimal, getMarket } from "../../utils";
 
 /* Account supplies assets into market and receives cTokens in exchange
  *
@@ -14,11 +16,24 @@ import { Mint } from "../../types/templates/CToken/CToken";
  *    No need to updateCommonCTokenStats, handleTransfer() will
  *    No need to update cTokenBalance, handleTransfer() will
  */
-// Currently not in use. Everything can be done in handleTransfer, since a Mint event
-// is always done alongside a Transfer event, with the same data
 export function handleMint(event: Mint): void {
-  log.info("Mint event handled", []);
-  log.info("param minter: {}", [event.params.minter.toHexString()]);
-  log.info("param mintAmount: {}", [event.params.mintAmount.toString()]);
-  log.info("param mintTokens: {}", [event.params.mintTokens.toString()]);
+  const marketId = event.address.toHexString();
+  const market = getMarket(marketId);
+
+  const mintEventId = event.transaction.hash.toHexString().concat("-").concat(event.transactionLogIndex.toString());
+  const cTokenAmount = event.params.mintTokens.toBigDecimal().div(CTokenDecimalsBD).truncate(CTokenDecimals);
+  const underlyingAmount = event.params.mintAmount
+    .toBigDecimal()
+    .div(exponentToBigDecimal(market.underlyingDecimals))
+    .truncate(market.underlyingDecimals);
+
+  const mintEvent = new MintEvent(mintEventId);
+  mintEvent.market = marketId;
+  mintEvent.blockNumber = event.block.number;
+  mintEvent.blockTime = event.block.timestamp;
+  mintEvent.from = event.address;
+  mintEvent.to = event.params.minter;
+  mintEvent.amount = cTokenAmount;
+  mintEvent.underlyingAmount = underlyingAmount;
+  mintEvent.save();
 }

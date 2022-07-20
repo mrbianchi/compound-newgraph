@@ -1,4 +1,4 @@
-import { Address, BigDecimal, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, Bytes, log } from "@graphprotocol/graph-ts";
 import { ZeroBD } from "../constants";
 import { PriceOracle } from "../types/Comptroller/PriceOracle";
 import { exponentToBigDecimal } from "./exponentToBigDecimal";
@@ -20,25 +20,16 @@ import { getComptroller } from "./getComptroller";
  * defer to Oracle 1 before block 7715908, which works,
  * until this one is deployed, which was used for 121 days */
 
-/* PriceOracle(1) is used (only for the first ~100 blocks of Comptroller. Annoying but we must
- * handle this. We use it for more than 100 blocks, see reason at top of if statement
- * of PriceOracle2.
- *
- * This must use the token address, not the cToken address.
- *
- * Note this returns the value already factoring in token decimals and wei, therefore
- * we only need to divide by the mantissa, 10^18 */
-
 // Used for all cERC20 contracts
 export function getTokenPrice(eventAddress: Address, underlyingDecimals: i32): BigDecimal {
   const comptroller = getComptroller();
 
-  if (!comptroller.priceOracle) {
-    log.error("getTokenPrice ::: comptroller priceOracle undefined", []);
+  if (!comptroller.priceOracleAddress) {
+    log.error("getTokenPrice ::: comptroller priceOracleAddress undefined", []);
     return ZeroBD;
   }
 
-  const oracleAddress = Address.fromBytes(comptroller.priceOracle);
+  const oracleAddress = Address.fromBytes(comptroller.priceOracleAddress as Bytes);
   const mantissaDecimalFactor = 18 - underlyingDecimals + 18;
   const bdFactor = exponentToBigDecimal(mantissaDecimalFactor);
   const oracle = PriceOracle.bind(oracleAddress);

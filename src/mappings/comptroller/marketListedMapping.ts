@@ -1,7 +1,15 @@
+import { log } from "@graphprotocol/graph-ts";
 import { MarketListed } from "../../types/Comptroller/Comptroller";
-import { createMarket } from "../../utils";
+import { createMarket, isNonFunctionalMarket } from "../../utils";
 
 export function handleMarketListed(event: MarketListed): void {
-  const market = createMarket(event.params.cToken.toHexString());
+  const marketId = event.params.cToken.toHexString();
+
+  if (isNonFunctionalMarket(marketId)) {
+    log.error("Non functional market {}", [marketId]);
+    return;
+  }
+
+  const market = createMarket(marketId);
   market.save();
 }

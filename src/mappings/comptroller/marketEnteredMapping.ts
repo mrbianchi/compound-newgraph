@@ -1,11 +1,18 @@
+import { log } from "@graphprotocol/graph-ts";
 import { MarketEntered } from "../../types/Comptroller/Comptroller";
-import { getMarket, updateCommonCTokenStats } from "../../utils";
+import { addTransactionToAccountMarket, getAccountMarket, isNonFunctionalMarket } from "../../utils";
 
 export function handleMarketEntered(event: MarketEntered): void {
-  const marketId = event.params.cToken.toHexString();
   const accountId = event.params.account.toHexString();
-  const market = getMarket(marketId);
-  const cTokenStats = updateCommonCTokenStats(market.id, market.symbol, accountId, event.transaction.hash, event.block);
-  cTokenStats.enteredMarket = true;
-  cTokenStats.save();
+  const marketId = event.params.cToken.toHexString();
+
+  if (isNonFunctionalMarket(marketId)) {
+    log.error("Non functional market {}", [marketId]);
+    return;
+  }
+
+  const accountMarket = getAccountMarket(accountId, marketId);
+  addTransactionToAccountMarket(accountMarket, event.block, event.transaction, event.transactionLogIndex);
+  accountMarket.enteredMarket = true;
+  accountMarket.save();
 }

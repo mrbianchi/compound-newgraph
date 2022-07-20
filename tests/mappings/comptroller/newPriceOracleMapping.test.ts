@@ -11,7 +11,7 @@ function createEvent(): NewPriceOracle {
   event.parameters.push(
     new ethereum.EventParam(
       "newPriceOracle",
-      ethereum.Value.fromAddress(Address.fromString(ComptrollerDefaultValues.PriceOracle))
+      ethereum.Value.fromAddress(Address.fromString(ComptrollerDefaultValues.PriceOracleAddress))
     )
   );
   return event;
@@ -30,16 +30,21 @@ describe("Comptroller ::: handleNewPriceOracle tests", () => {
     handleNewPriceOracle(event);
 
     assert.entityCount("Comptroller", 1);
-    assert.fieldEquals("Comptroller", ComptrollerDefaultValues.Id, "priceOracle", ComptrollerDefaultValues.PriceOracle);
+    assert.fieldEquals(
+      "Comptroller",
+      ComptrollerDefaultValues.Id,
+      "priceOracleAddress",
+      ComptrollerDefaultValues.PriceOracleAddress
+    );
   });
 
   test("It should update an existing Comptroller", () => {
-    const comptroller = new ComptrollerBuilder().withPriceOracle(NullAddressString).build();
+    const comptroller = new ComptrollerBuilder().withPriceOracleAddress(NullAddressString).build();
     const event = createEvent();
 
     handleNewPriceOracle(event);
 
     assert.entityCount("Comptroller", 1);
-    assert.fieldEquals("Comptroller", comptroller.id, "priceOracle", ComptrollerDefaultValues.PriceOracle);
+    assert.fieldEquals("Comptroller", comptroller.id, "priceOracleAddress", ComptrollerDefaultValues.PriceOracleAddress);
   });
 });

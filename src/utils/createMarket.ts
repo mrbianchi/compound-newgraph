@@ -7,6 +7,8 @@ import { Market } from "../types/schema";
 import { CToken } from "../types/templates";
 
 function fillCommonMarket(market: Market): void {
+  market.mintsPaused = false;
+  market.borrowsPaused = false;
   market.borrowRate = ZeroBD;
   market.cash = ZeroBD;
   market.collateralFactor = ZeroBD;
@@ -18,7 +20,7 @@ function fillCommonMarket(market: Market): void {
   market.supplyRate = ZeroBD;
   market.totalBorrows = ZeroBD;
   market.totalSupply = ZeroBD;
-  market.underlyingPrice = ZeroBD;
+  market.underlyingPriceETH = ZeroBD;
   market.accrualBlockNumber = ZeroBI;
   market.blockTimestamp = ZeroBI;
   market.borrowIndex = ZeroBD;
@@ -26,6 +28,9 @@ function fillCommonMarket(market: Market): void {
   market.underlyingPriceUSD = ZeroBD;
   market.underlyingAddress = NullAddress;
   market.underlyingDecimals = 0;
+  market.compBorrowSpeed = ZeroBI;
+  market.compSupplySpeed = ZeroBI;
+  market.borrowCap = ZeroBI;
 }
 
 function fillEtherMarket(market: Market): void {
@@ -39,7 +44,7 @@ function fillEtherMarket(market: Market): void {
   market.interestRateModelAddress = contract.interestRateModel();
   market.reserveFactor = contract.reserveFactorMantissa();
   market.underlyingDecimals = 18;
-  market.underlyingPrice = BigDecimal.fromString("1");
+  market.underlyingPriceETH = BigDecimal.fromString("1");
 }
 
 function fillERC20Market(market: Market): void {
@@ -75,7 +80,7 @@ export function createMarket(marketId: string): Market {
   fillCommonMarket(market);
 
   if (marketId == cEtherAddress) {
-    // It is CETH, which has a slightly different interface
+    // It is cETH, which has a slightly different interface
     fillEtherMarket(market);
   } else {
     // It is all other CERC20 contracts
