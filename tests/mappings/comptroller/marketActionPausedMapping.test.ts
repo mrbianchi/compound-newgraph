@@ -20,17 +20,6 @@ describe("Comptroller ::: handleMarketActionPaused tests", () => {
     clearStore();
   });
 
-  test("It should create a Market if it doesn't exist", () => {
-    const event = createEvent(MarketActionTypes.Mint);
-
-    assert.entityCount("Market", 0);
-
-    handleMarketActionPaused(event);
-
-    assert.entityCount("Market", 1);
-    assert.fieldEquals("Market", MarketDefaultValues.Id, "mintsPaused", true.toString());
-  });
-
   test("It should pause mints on an existing Market", () => {
     const market = new MarketBuilder().withMintsPaused(false).build();
     const event = createEvent(MarketActionTypes.Mint);

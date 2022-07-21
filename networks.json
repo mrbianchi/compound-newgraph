@@ -12,7 +12,7 @@
       "address": "0x6d903f6003cca6255D85CcA4D3B5E5146dC33925",
       "startBlock": 8722895
     },
-    "cEther": {
+    "cNative": {
       "address": "0x4Ddc2D193948926D02f9B1fE9e1daa0718270ED5",
       "startBlock": 7710758
     },
@@ -62,7 +62,7 @@
       "address": "0x0000000000000000000000000000000000000000",
       "startBlock": 32600000
     },
-    "cEther": {
+    "cNative": {
       "address": "0x0000000000000000000000000000000000000000",
       "startBlock": 32600000
     },

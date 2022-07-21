@@ -21,7 +21,7 @@ export abstract class MarketDefaultValues {
   public static readonly SupplyRate: BigDecimal = ZeroBD;
   public static readonly TotalBorrows: BigDecimal = ZeroBD;
   public static readonly TotalSupply: BigDecimal = ZeroBD;
-  public static readonly UnderlyingPriceETH: BigDecimal = ZeroBD;
+  public static readonly UnderlyingPriceNative: BigDecimal = ZeroBD;
   public static readonly AccrualBlockNumber: u64 = 0;
   public static readonly BlockTimestamp: u64 = 0;
   public static readonly BorrowIndex: BigDecimal = ZeroBD;
@@ -53,7 +53,7 @@ export class MarketBuilder {
   private supplyRate: BigDecimal = MarketDefaultValues.SupplyRate;
   private totalBorrows: BigDecimal = MarketDefaultValues.TotalBorrows;
   private totalSupply: BigDecimal = MarketDefaultValues.TotalSupply;
-  private underlyingPriceETH: BigDecimal = MarketDefaultValues.UnderlyingPriceETH;
+  private underlyingPriceNative: BigDecimal = MarketDefaultValues.UnderlyingPriceNative;
   private accrualBlockNumber: u64 = MarketDefaultValues.AccrualBlockNumber;
   private blockTimestamp: u64 = MarketDefaultValues.BlockTimestamp;
   private borrowIndex: BigDecimal = MarketDefaultValues.BorrowIndex;
@@ -84,7 +84,7 @@ export class MarketBuilder {
     entity.supplyRate = this.supplyRate;
     entity.totalBorrows = this.totalBorrows;
     entity.totalSupply = this.totalSupply;
-    entity.underlyingPriceETH = this.underlyingPriceETH;
+    entity.underlyingPriceNative = this.underlyingPriceNative;
     entity.accrualBlockNumber = BigInt.fromU64(this.accrualBlockNumber);
     entity.blockTimestamp = BigInt.fromU64(this.blockTimestamp);
     entity.borrowIndex = this.borrowIndex;

@@ -1,5 +1,13 @@
 import { Address, BigDecimal } from "@graphprotocol/graph-ts";
-import { NullAddress, ZeroBD, ZeroBI, cEtherAddress } from "../constants";
+import {
+  NativeTokenDecimals,
+  NativeTokenName,
+  NativeTokenSymbol,
+  NullAddress,
+  ZeroBD,
+  ZeroBI,
+  cNativeAddress,
+} from "../constants";
 import { ERC20 } from "../types/Comptroller/ERC20";
 import { cERC20Delegator } from "../types/Comptroller/cERC20Delegator";
 import { cEther } from "../types/Comptroller/cEther";
@@ -20,7 +28,7 @@ function fillCommonMarket(market: Market): void {
   market.supplyRate = ZeroBD;
   market.totalBorrows = ZeroBD;
   market.totalSupply = ZeroBD;
-  market.underlyingPriceETH = ZeroBD;
+  market.underlyingPriceNative = ZeroBD;
   market.accrualBlockNumber = ZeroBI;
   market.blockTimestamp = ZeroBI;
   market.borrowIndex = ZeroBD;
@@ -33,18 +41,18 @@ function fillCommonMarket(market: Market): void {
   market.borrowCap = ZeroBI;
 }
 
-function fillEtherMarket(market: Market): void {
+function fillNativeMarket(market: Market): void {
   const contract = cEther.bind(Address.fromString(market.id));
 
   market.name = contract.name();
   market.symbol = contract.symbol();
-  market.underlyingName = "Ether";
-  market.underlyingSymbol = "ETH";
+  market.underlyingName = NativeTokenName;
+  market.underlyingSymbol = NativeTokenSymbol;
 
   market.interestRateModelAddress = contract.interestRateModel();
   market.reserveFactor = contract.reserveFactorMantissa();
-  market.underlyingDecimals = 18;
-  market.underlyingPriceETH = BigDecimal.fromString("1");
+  market.underlyingDecimals = NativeTokenDecimals;
+  market.underlyingPriceNative = BigDecimal.fromString("1");
 }
 
 function fillERC20Market(market: Market): void {
@@ -61,14 +69,6 @@ function fillERC20Market(market: Market): void {
   market.interestRateModelAddress = contract.interestRateModel();
   market.reserveFactor = contract.reserveFactorMantissa();
   market.underlyingDecimals = underlyingContract.decimals();
-
-  ///if (market.underlyingAddress.toHexString() == daiAddress) {
-  //  market.underlyingName = "Dai Stablecoin v1.0 (DAI)";
-  //  market.underlyingSymbol = "DAI";
-  //}
-  //if (marketAddress == cUSDCAddress) {
-  //  market.underlyingPriceUSD = BigDecimal.fromString("1");
-  //}
 }
 
 export function createMarket(marketId: string): Market {
@@ -79,9 +79,9 @@ export function createMarket(marketId: string): Market {
 
   fillCommonMarket(market);
 
-  if (marketId == cEtherAddress) {
-    // It is cETH, which has a slightly different interface
-    fillEtherMarket(market);
+  if (marketId == cNativeAddress) {
+    // It is ctoken of native token, which has a slightly different interface
+    fillNativeMarket(market);
   } else {
     // It is all other CERC20 contracts
     fillERC20Market(market);

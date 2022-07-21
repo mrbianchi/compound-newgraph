@@ -20,17 +20,6 @@ describe("Comptroller ::: handleCompSupplySpeedUpdated tests", () => {
     clearStore();
   });
 
-  test("It should create ther market if it doesn't exist", () => {
-    const event = createEvent();
-
-    assert.entityCount("Market", 0);
-
-    handleCompSupplySpeedUpdated(event);
-
-    assert.entityCount("Market", 1);
-    assert.fieldEquals("Market", MarketDefaultValues.Id, "compSupplySpeed", MarketDefaultValues.CompSupplySpeed.toString());
-  });
-
   test("It should update an existing Market", () => {
     const market = new MarketBuilder().withCompBorrowSpeed(1234).build();
     const event = createEvent();
@@ -38,6 +27,6 @@ describe("Comptroller ::: handleCompSupplySpeedUpdated tests", () => {
     handleCompSupplySpeedUpdated(event);
 
     assert.entityCount("Market", 1);
-    assert.fieldEquals("Market", market.id, "compSupplySpeed", "1234");
+    assert.fieldEquals("Market", market.id, "compSupplySpeed", "0");
   });
 });

@@ -28,8 +28,8 @@ type Market @entity {
   underlyingAddress: Bytes!
   "Underlying token decimal length"
   underlyingDecimals: Int!
-  "Underlying token price in ETH"
-  underlyingPriceETH: BigDecimal!
+  "Underlying token price in native token"
+  underlyingPriceNative: BigDecimal!
   "Underlying token price in USD"
   underlyingPriceUSD: BigDecimal!
   "Number of suppliers active in the market"
@@ -45,7 +45,7 @@ type Market @entity {
   "Yearly borrow rate. With 2102400 blocks per year"
   borrowRate: BigDecimal!
 
-  "The cToken contract balance of ERC20 or ETH"
+  "The cToken contract balance of ERC20 or native token"
   cash: BigDecimal!
   "Collateral factor determining how much one can borrow"
   collateralFactor: BigDecimal!
@@ -255,9 +255,9 @@ type Account @entity {
   # "If less than 1, the account can be liquidated
   # health: BigDecimal!
   # "Total assets supplied by user"
-  # totalBorrowValueInEth: BigDecimal!
+  # totalBorrowValueInNative: BigDecimal!
   # "Total assets borrowed from user"
-  # totalCollateralValueInEth: BigDecimal!
+  # totalCollateralValueInNative: BigDecimal!
 }
 
 type AccountMarket @entity {

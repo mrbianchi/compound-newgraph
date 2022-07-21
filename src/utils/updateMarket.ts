@@ -1,5 +1,5 @@
 import { Address, BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
-import { CTokenDecimalsBD, MantissaFactor, MantissaFactorBD, ZeroBD, cEtherAddress } from "../constants";
+import { CTokenDecimalsBD, MantissaFactor, MantissaFactorBD, NativeTokenDecimals, ZeroBD, cNativeAddress } from "../constants";
 import { Market } from "../types/schema";
 import { CToken } from "../types/templates/CToken/CToken";
 import { exponentToBigDecimal } from "./exponentToBigDecimal";
@@ -48,39 +48,34 @@ function updateCommonMarket(market: Market, block: ethereum.Block): void {
     .truncate(market.underlyingDecimals);
 
   // Must convert to BigDecimal, and remove 10^18 that is used for Exp in Compound Solidity
-  market.supplyRate = contract
+  market.borrowRate = contract
     .borrowRatePerBlock()
     .toBigDecimal()
     .times(BigDecimal.fromString("2102400"))
     .div(MantissaFactorBD)
     .truncate(MantissaFactor);
 
-  // This fails on only the first call to cZRX. It is unclear why, but otherwise it works.
-  // So we handle it like this.
-  const supplyRatePerBlock = contract.try_supplyRatePerBlock();
-  if (supplyRatePerBlock.reverted) {
-    log.error("updateCommonMarket ::: cERC20 supplyRatePerBlock() reverted", []);
-    market.borrowRate = ZeroBD;
-  } else {
-    market.borrowRate = supplyRatePerBlock.value
-      .toBigDecimal()
-      .times(BigDecimal.fromString("2102400"))
-      .div(MantissaFactorBD)
-      .truncate(MantissaFactor);
-  }
+  market.supplyRate = contract
+    .supplyRatePerBlock()
+    .toBigDecimal()
+    .times(BigDecimal.fromString("2102400"))
+    .div(MantissaFactorBD)
+    .truncate(MantissaFactor);
 }
 
-function updateEtherMarket(market: Market): void {
+function updateNativeMarket(market: Market): void {
   const contractAddress = Address.fromString(market.id);
   const tokenPriceUSD = getTokenPrice(contractAddress, market.underlyingDecimals);
-  //market.underlyingPrice = BigDecimal.fromString("1");
-  market.underlyingPriceUSD = tokenPriceUSD.truncate(market.underlyingDecimals); //market.underlyingPrice.div(usdPriceInEth).truncate(market.underlyingDecimals);
+  market.underlyingPriceUSD = tokenPriceUSD.truncate(market.underlyingDecimals);
 }
 
 function updateERC20Market(market: Market): void {
   const contractAddress = Address.fromString(market.id);
+  const nativeTokenAddress = Address.fromString(cNativeAddress);
   const tokenPriceUSD = getTokenPrice(contractAddress, market.underlyingDecimals);
-  market.underlyingPriceETH = tokenPriceUSD.truncate(market.underlyingDecimals);
+  const nativeTokenPriceUSD = getTokenPrice(nativeTokenAddress, NativeTokenDecimals);
+
+  market.underlyingPriceNative = tokenPriceUSD.div(nativeTokenPriceUSD).truncate(market.underlyingDecimals);
   market.underlyingPriceUSD = tokenPriceUSD.truncate(market.underlyingDecimals);
 }
 
@@ -92,9 +87,9 @@ export function updateMarket(market: Market, block: ethereum.Block): Market {
 
   updateCommonMarket(market, block);
 
-  if (market.id == cEtherAddress) {
-    // if cETH, we only update USD price
-    updateEtherMarket(market);
+  if (market.id == cNativeAddress) {
+    // It is ctoken of native token, we only update USD price
+    updateNativeMarket(market);
   } else {
     updateERC20Market(market);
   }

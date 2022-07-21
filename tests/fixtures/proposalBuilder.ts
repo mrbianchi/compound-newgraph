@@ -80,7 +80,7 @@ export class ProposalBuilder {
     return this;
   }
 
-  withStartBlock(startBlockNumber: u64): ProposalBuilder {
+  withStartBlockNumber(startBlockNumber: u64): ProposalBuilder {
     this.startBlockNumber = startBlockNumber;
     return this;
   }

@@ -1,6 +1,6 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { assert, beforeEach, clearStore, createMockedFunction, describe, newMockEvent, test } from "matchstick-as";
-import { cEtherAddress } from "../../../src/constants";
+import { NativeTokenDecimals, NativeTokenName, NativeTokenSymbol, cNativeAddress } from "../../../src/constants";
 import { handleMarketListed } from "../../../src/mappings/comptroller/marketListedMapping";
 import { MarketListed } from "../../../src/types/Comptroller/Comptroller";
 
@@ -9,19 +9,19 @@ describe("Comptroller ::: marketListedMapping tests", () => {
     clearStore();
   });
 
-  test("It should save the listed Ether market", () => {
-    const cEtherContractAddress = Address.fromString(cEtherAddress);
+  test("It should save the listed Native market", () => {
+    const cNativeContractAddress = Address.fromString(cNativeAddress);
     const event = changetype<MarketListed>(newMockEvent());
-    event.parameters.push(new ethereum.EventParam("cToken", ethereum.Value.fromAddress(cEtherContractAddress)));
+    event.parameters.push(new ethereum.EventParam("cToken", ethereum.Value.fromAddress(cNativeContractAddress)));
 
-    createMockedFunction(cEtherContractAddress, "name", "name():(string)").returns([
-      ethereum.Value.fromString("Delegated Ether"),
+    createMockedFunction(cNativeContractAddress, "name", "name():(string)").returns([
+      ethereum.Value.fromString("Delegated Native"),
     ]);
-    createMockedFunction(cEtherContractAddress, "symbol", "symbol():(string)").returns([ethereum.Value.fromString("dETH")]);
-    createMockedFunction(cEtherContractAddress, "interestRateModel", "interestRateModel():(address)").returns([
+    createMockedFunction(cNativeContractAddress, "symbol", "symbol():(string)").returns([ethereum.Value.fromString("dNative")]);
+    createMockedFunction(cNativeContractAddress, "interestRateModel", "interestRateModel():(address)").returns([
       ethereum.Value.fromAddress(Address.fromString("0xfafafa0000000000000000000000000000000001")),
     ]);
-    createMockedFunction(cEtherContractAddress, "reserveFactorMantissa", "reserveFactorMantissa():(uint256)").returns([
+    createMockedFunction(cNativeContractAddress, "reserveFactorMantissa", "reserveFactorMantissa():(uint256)").returns([
       ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(200000000000000000)),
     ]);
 
@@ -30,35 +30,35 @@ describe("Comptroller ::: marketListedMapping tests", () => {
     handleMarketListed(event);
 
     assert.entityCount("Market", 1);
-    assert.fieldEquals("Market", cEtherAddress, "name", "Delegated Ether");
-    assert.fieldEquals("Market", cEtherAddress, "symbol", "dETH");
-    assert.fieldEquals("Market", cEtherAddress, "underlyingName", "Ether");
-    assert.fieldEquals("Market", cEtherAddress, "underlyingSymbol", "ETH");
-    assert.fieldEquals("Market", cEtherAddress, "interestRateModelAddress", "0xfafafa0000000000000000000000000000000001");
-    assert.fieldEquals("Market", cEtherAddress, "reserveFactor", "200000000000000000");
-    assert.fieldEquals("Market", cEtherAddress, "underlyingDecimals", "18");
-    assert.fieldEquals("Market", cEtherAddress, "underlyingPrice", "1");
-    assert.fieldEquals("Market", cEtherAddress, "borrowRate", "0");
-    assert.fieldEquals("Market", cEtherAddress, "cash", "0");
-    assert.fieldEquals("Market", cEtherAddress, "collateralFactor", "0");
-    assert.fieldEquals("Market", cEtherAddress, "exchangeRate", "0");
-    assert.fieldEquals("Market", cEtherAddress, "interestRateModelAddress", "0xfafafa0000000000000000000000000000000001");
-    assert.fieldEquals("Market", cEtherAddress, "numberOfBorrowers", "0");
-    assert.fieldEquals("Market", cEtherAddress, "numberOfSuppliers", "0");
-    assert.fieldEquals("Market", cEtherAddress, "reserves", "0");
-    assert.fieldEquals("Market", cEtherAddress, "supplyRate", "0");
-    assert.fieldEquals("Market", cEtherAddress, "totalBorrows", "0");
-    assert.fieldEquals("Market", cEtherAddress, "totalSupply", "0");
-    assert.fieldEquals("Market", cEtherAddress, "accrualBlockNumber", "0");
-    assert.fieldEquals("Market", cEtherAddress, "blockTimestamp", "0");
-    assert.fieldEquals("Market", cEtherAddress, "borrowIndex", "0");
-    assert.fieldEquals("Market", cEtherAddress, "reserveFactor", "200000000000000000");
-    assert.fieldEquals("Market", cEtherAddress, "underlyingPriceUSD", "0");
-    assert.fieldEquals("Market", cEtherAddress, "underlyingAddress", "0x0000000000000000000000000000000000000000");
-    assert.fieldEquals("Market", cEtherAddress, "underlyingDecimals", "18");
+    assert.fieldEquals("Market", cNativeAddress, "name", "Delegated Native");
+    assert.fieldEquals("Market", cNativeAddress, "symbol", "dNative");
+    assert.fieldEquals("Market", cNativeAddress, "underlyingName", NativeTokenName);
+    assert.fieldEquals("Market", cNativeAddress, "underlyingSymbol", NativeTokenSymbol);
+    assert.fieldEquals("Market", cNativeAddress, "interestRateModelAddress", "0xfafafa0000000000000000000000000000000001");
+    assert.fieldEquals("Market", cNativeAddress, "reserveFactor", "200000000000000000");
+    assert.fieldEquals("Market", cNativeAddress, "underlyingDecimals", NativeTokenDecimals.toString());
+    assert.fieldEquals("Market", cNativeAddress, "underlyingPriceNative", "1");
+    assert.fieldEquals("Market", cNativeAddress, "borrowRate", "0");
+    assert.fieldEquals("Market", cNativeAddress, "cash", "0");
+    assert.fieldEquals("Market", cNativeAddress, "collateralFactor", "0");
+    assert.fieldEquals("Market", cNativeAddress, "exchangeRate", "0");
+    assert.fieldEquals("Market", cNativeAddress, "interestRateModelAddress", "0xfafafa0000000000000000000000000000000001");
+    assert.fieldEquals("Market", cNativeAddress, "numberOfBorrowers", "0");
+    assert.fieldEquals("Market", cNativeAddress, "numberOfSuppliers", "0");
+    assert.fieldEquals("Market", cNativeAddress, "reserves", "0");
+    assert.fieldEquals("Market", cNativeAddress, "supplyRate", "0");
+    assert.fieldEquals("Market", cNativeAddress, "totalBorrows", "0");
+    assert.fieldEquals("Market", cNativeAddress, "totalSupply", "0");
+    assert.fieldEquals("Market", cNativeAddress, "accrualBlockNumber", "0");
+    assert.fieldEquals("Market", cNativeAddress, "blockTimestamp", "0");
+    assert.fieldEquals("Market", cNativeAddress, "borrowIndex", "0");
+    assert.fieldEquals("Market", cNativeAddress, "reserveFactor", "200000000000000000");
+    assert.fieldEquals("Market", cNativeAddress, "underlyingPriceUSD", "0");
+    assert.fieldEquals("Market", cNativeAddress, "underlyingAddress", "0x0000000000000000000000000000000000000000");
+    assert.fieldEquals("Market", cNativeAddress, "underlyingDecimals", "18");
   });
 
-  test("It should save the listed non-Ether market", () => {
+  test("It should save the listed non-Native market", () => {
     const tokenAddressString = "0xfafafa0000000000000000000000000000000009";
     const tokenAddress = Address.fromString(tokenAddressString);
     const underlyingTokenAddress = Address.fromString("0xfafafa0000000000000000000000000000000010");
@@ -68,8 +68,8 @@ describe("Comptroller ::: marketListedMapping tests", () => {
     createMockedFunction(tokenAddress, "underlying", "underlying():(address)").returns([
       ethereum.Value.fromAddress(underlyingTokenAddress),
     ]);
-    createMockedFunction(tokenAddress, "name", "name():(string)").returns([ethereum.Value.fromString("Delegated non-Ether")]);
-    createMockedFunction(tokenAddress, "symbol", "symbol():(string)").returns([ethereum.Value.fromString("dNETH")]);
+    createMockedFunction(tokenAddress, "name", "name():(string)").returns([ethereum.Value.fromString("Delegated non-Native")]);
+    createMockedFunction(tokenAddress, "symbol", "symbol():(string)").returns([ethereum.Value.fromString("dNNative")]);
     createMockedFunction(tokenAddress, "interestRateModel", "interestRateModel():(address)").returns([
       ethereum.Value.fromAddress(Address.fromString("0xfafafa0000000000000000000000000000000011")),
     ]);
@@ -77,8 +77,8 @@ describe("Comptroller ::: marketListedMapping tests", () => {
       ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(200000000000000000)),
     ]);
 
-    createMockedFunction(underlyingTokenAddress, "name", "name():(string)").returns([ethereum.Value.fromString("non-Ether")]);
-    createMockedFunction(underlyingTokenAddress, "symbol", "symbol():(string)").returns([ethereum.Value.fromString("NETH")]);
+    createMockedFunction(underlyingTokenAddress, "name", "name():(string)").returns([ethereum.Value.fromString("non-Native")]);
+    createMockedFunction(underlyingTokenAddress, "symbol", "symbol():(string)").returns([ethereum.Value.fromString("NNative")]);
     createMockedFunction(underlyingTokenAddress, "decimals", "decimals():(uint8)").returns([ethereum.Value.fromI32(18)]);
 
     assert.entityCount("Market", 0);
@@ -86,10 +86,10 @@ describe("Comptroller ::: marketListedMapping tests", () => {
     handleMarketListed(event);
 
     assert.entityCount("Market", 1);
-    assert.fieldEquals("Market", tokenAddressString, "name", "Delegated non-Ether");
-    assert.fieldEquals("Market", tokenAddressString, "symbol", "dNETH");
-    assert.fieldEquals("Market", tokenAddressString, "underlyingName", "non-Ether");
-    assert.fieldEquals("Market", tokenAddressString, "underlyingSymbol", "NETH");
+    assert.fieldEquals("Market", tokenAddressString, "name", "Delegated non-Native");
+    assert.fieldEquals("Market", tokenAddressString, "symbol", "dNNative");
+    assert.fieldEquals("Market", tokenAddressString, "underlyingName", "non-Native");
+    assert.fieldEquals("Market", tokenAddressString, "underlyingSymbol", "NNative");
     assert.fieldEquals("Market", tokenAddressString, "interestRateModelAddress", "0xfafafa0000000000000000000000000000000011");
     assert.fieldEquals("Market", tokenAddressString, "reserveFactor", "200000000000000000");
     assert.fieldEquals("Market", tokenAddressString, "underlyingDecimals", "18");
@@ -104,7 +104,7 @@ describe("Comptroller ::: marketListedMapping tests", () => {
     assert.fieldEquals("Market", tokenAddressString, "supplyRate", "0");
     assert.fieldEquals("Market", tokenAddressString, "totalBorrows", "0");
     assert.fieldEquals("Market", tokenAddressString, "totalSupply", "0");
-    assert.fieldEquals("Market", tokenAddressString, "underlyingPrice", "0");
+    assert.fieldEquals("Market", tokenAddressString, "underlyingPriceNative", "0");
     assert.fieldEquals("Market", tokenAddressString, "accrualBlockNumber", "0");
     assert.fieldEquals("Market", tokenAddressString, "blockTimestamp", "0");
     assert.fieldEquals("Market", tokenAddressString, "borrowIndex", "0");

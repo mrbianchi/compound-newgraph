@@ -32,8 +32,8 @@ describe("cToken ::: handleNewReserveFactor tests", () => {
     createMockedFunction(tokenAddress, "underlying", "underlying():(address)").returns([
       ethereum.Value.fromAddress(underlyingTokenAddress),
     ]);
-    createMockedFunction(tokenAddress, "name", "name():(string)").returns([ethereum.Value.fromString("Delegated non-Ether")]);
-    createMockedFunction(tokenAddress, "symbol", "symbol():(string)").returns([ethereum.Value.fromString("dNETH")]);
+    createMockedFunction(tokenAddress, "name", "name():(string)").returns([ethereum.Value.fromString("Delegated non-Native")]);
+    createMockedFunction(tokenAddress, "symbol", "symbol():(string)").returns([ethereum.Value.fromString("dNNative")]);
     createMockedFunction(tokenAddress, "interestRateModel", "interestRateModel():(address)").returns([
       ethereum.Value.fromAddress(Address.fromString("0xfafafa0000000000000000000000000000000011")),
     ]);
@@ -41,8 +41,8 @@ describe("cToken ::: handleNewReserveFactor tests", () => {
       ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(200000000000000000)),
     ]);
 
-    createMockedFunction(underlyingTokenAddress, "name", "name():(string)").returns([ethereum.Value.fromString("non-Ether")]);
-    createMockedFunction(underlyingTokenAddress, "symbol", "symbol():(string)").returns([ethereum.Value.fromString("NETH")]);
+    createMockedFunction(underlyingTokenAddress, "name", "name():(string)").returns([ethereum.Value.fromString("non-Native")]);
+    createMockedFunction(underlyingTokenAddress, "symbol", "symbol():(string)").returns([ethereum.Value.fromString("NNative")]);
     createMockedFunction(underlyingTokenAddress, "decimals", "decimals():(uint8)").returns([ethereum.Value.fromI32(18)]);
 
     assert.entityCount("Market", 0);
