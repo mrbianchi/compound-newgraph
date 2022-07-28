@@ -71,7 +71,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   repayEvent.accountBorrows = accountBorrows;
   repayEvent.borrower = event.params.borrower;
   repayEvent.blockNumber = event.block.number;
-  repayEvent.blockTime = event.block.timestamp;
+  repayEvent.blockTimestamp = event.block.timestamp;
   repayEvent.payer = event.params.payer;
   repayEvent.save();
 }

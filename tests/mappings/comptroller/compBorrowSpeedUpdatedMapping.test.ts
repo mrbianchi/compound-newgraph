@@ -11,7 +11,7 @@ function createEvent(): CompBorrowSpeedUpdated {
   );
 
   event.parameters.push(
-    new ethereum.EventParam("newSpeed", ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(MarketDefaultValues.CompBorrowSpeed)))
+    new ethereum.EventParam("newSpeed", ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(MarketDefaultValues.CompSpeedBorrow)))
   );
   return event;
 }
@@ -22,12 +22,12 @@ describe("Comptroller ::: handleCompBorrowSpeedUpdated tests", () => {
   });
 
   test("It should update an existing Market", () => {
-    const market = new MarketBuilder().withCompBorrowSpeed(1234).build();
+    const market = new MarketBuilder().withCompSpeedBorrow(1234).build();
     const event = createEvent();
 
     handleCompBorrowSpeedUpdated(event);
 
     assert.entityCount("Market", 1);
-    assert.fieldEquals("Market", market.id, "compBorrowSpeed", "0");
+    assert.fieldEquals("Market", market.id, "compSpeedBorrow", "0");
   });
 });

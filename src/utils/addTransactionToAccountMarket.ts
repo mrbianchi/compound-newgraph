@@ -22,7 +22,7 @@ export function addTransactionToAccountMarket(
   accountMarketTransaction.accountMarket = accountMarket.id;
   accountMarketTransaction.transactionLogIndex = transactionLogIndex;
   accountMarketTransaction.blockNumber = block.number;
-  accountMarketTransaction.blockTime = block.timestamp;
+  accountMarketTransaction.blockTimestamp = block.timestamp;
   accountMarketTransaction.transactionHash = transaction.hash;
   accountMarketTransaction.save();
 }

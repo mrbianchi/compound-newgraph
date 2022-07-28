@@ -1,4 +1,4 @@
-import { DefaultComptrollerId, NullAddress, ZeroBI } from "../constants";
+import { DefaultComptrollerId, NullAddress, ZeroBD, ZeroBI } from "../constants";
 import { Comptroller } from "../types/schema";
 
 export function getComptroller(): Comptroller {
@@ -11,6 +11,11 @@ export function getComptroller(): Comptroller {
     comptroller.liquidationIncentiveMantissa = ZeroBI;
     comptroller.transfersPaused = false;
     comptroller.seizesPaused = false;
+    comptroller.totalSupplyUSD = ZeroBD;
+    comptroller.totalBorrowUSD = ZeroBD;
+    comptroller.totalReservesUSD = ZeroBD;
+    comptroller.utilization = ZeroBD;
+    comptroller.markets = [];
     comptroller.save();
   }
 

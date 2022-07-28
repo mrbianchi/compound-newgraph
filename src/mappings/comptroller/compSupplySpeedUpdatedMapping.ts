@@ -11,6 +11,6 @@ export function handleCompSupplySpeedUpdated(event: CompSupplySpeedUpdated): voi
   }
 
   const market = getMarket(marketId);
-  market.compSupplySpeed = event.params.newSpeed;
+  market.compSpeedSupply = event.params.newSpeed;
   market.save();
 }

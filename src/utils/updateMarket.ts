@@ -8,8 +8,8 @@ import { getTokenPrice } from "./getTokenPrice";
 function updateCommonMarket(market: Market, block: ethereum.Block): void {
   const contractAddress = Address.fromString(market.id);
   const contract = CToken.bind(contractAddress);
-  market.accrualBlockNumber = contract.accrualBlockNumber();
-  market.blockTimestamp = block.timestamp;
+  market.latestBlockNumber = contract.accrualBlockNumber();
+  market.latestBlockTimestamp = block.timestamp;
   market.totalSupply = contract.totalSupply().toBigDecimal().div(CTokenDecimalsBD);
 
   /* Exchange rate explanation
@@ -31,12 +31,12 @@ function updateCommonMarket(market: Market, block: ethereum.Block): void {
     .truncate(MantissaFactor);
   market.borrowIndex = contract.borrowIndex().toBigDecimal().div(MantissaFactorBD).truncate(MantissaFactor);
 
-  market.reserves = contract
+  market.totalReserves = contract
     .totalReserves()
     .toBigDecimal()
     .div(exponentToBigDecimal(market.underlyingDecimals))
     .truncate(market.underlyingDecimals);
-  market.totalBorrows = contract
+  market.totalBorrow = contract
     .totalBorrows()
     .toBigDecimal()
     .div(exponentToBigDecimal(market.underlyingDecimals))
@@ -48,14 +48,14 @@ function updateCommonMarket(market: Market, block: ethereum.Block): void {
     .truncate(market.underlyingDecimals);
 
   // Must convert to BigDecimal, and remove 10^18 that is used for Exp in Compound Solidity
-  market.borrowRate = contract
+  market.borrowRatePerBlock = contract
     .borrowRatePerBlock()
     .toBigDecimal()
     .times(BigDecimal.fromString("2102400"))
     .div(MantissaFactorBD)
     .truncate(MantissaFactor);
 
-  market.supplyRate = contract
+  market.supplyRatePerBlock = contract
     .supplyRatePerBlock()
     .toBigDecimal()
     .times(BigDecimal.fromString("2102400"))
@@ -81,7 +81,7 @@ function updateERC20Market(market: Market): void {
 
 export function updateMarket(market: Market, block: ethereum.Block): Market {
   // Only updateMarket if it has not been updated this block
-  if (market.accrualBlockNumber == block.number) {
+  if (market.latestBlockNumber == block.number) {
     return market;
   }
 

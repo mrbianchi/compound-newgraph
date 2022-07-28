@@ -37,7 +37,7 @@ export function handleMint(event: Mint): void {
   const mintEvent = new MintEvent(mintEventId);
   mintEvent.market = marketId;
   mintEvent.blockNumber = event.block.number;
-  mintEvent.blockTime = event.block.timestamp;
+  mintEvent.blockTimestamp = event.block.timestamp;
   mintEvent.from = event.address;
   mintEvent.to = event.params.minter;
   mintEvent.amount = cTokenAmount;

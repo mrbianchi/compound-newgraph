@@ -68,6 +68,6 @@ export function handleBorrow(event: Borrow): void {
   borrowEvent.accountBorrows = accountBorrows;
   borrowEvent.borrower = event.params.borrower;
   borrowEvent.blockNumber = event.block.number;
-  borrowEvent.blockTime = event.block.timestamp;
+  borrowEvent.blockTimestamp = event.block.timestamp;
   borrowEvent.save();
 }

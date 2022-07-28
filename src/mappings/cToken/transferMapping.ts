@@ -102,7 +102,7 @@ export function handleTransfer(event: Transfer): void {
   const transferEvent = new TransferEvent(transferEventId);
   transferEvent.market = marketId;
   transferEvent.blockNumber = event.block.number;
-  transferEvent.blockTime = event.block.timestamp;
+  transferEvent.blockTimestamp = event.block.timestamp;
   transferEvent.from = event.params.from;
   transferEvent.to = event.params.to;
   transferEvent.amount = event.params.amount.toBigDecimal().div(CTokenDecimalsBD);

@@ -66,7 +66,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   liquidationEvent.to = event.params.liquidator;
   liquidationEvent.from = event.params.borrower;
   liquidationEvent.blockNumber = event.block.number;
-  liquidationEvent.blockTime = event.block.timestamp;
+  liquidationEvent.blockTimestamp = event.block.timestamp;
   liquidationEvent.underlyingRepayAmount = underlyingRepayAmount;
   liquidationEvent.save();
 }

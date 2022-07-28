@@ -1,5 +1,7 @@
 import { Address, BigDecimal } from "@graphprotocol/graph-ts";
 import {
+  CTokenDecimals,
+  DefaultComptrollerId,
   NativeTokenDecimals,
   NativeTokenName,
   NativeTokenSymbol,
@@ -15,30 +17,45 @@ import { Market } from "../types/schema";
 import { CToken } from "../types/templates";
 
 function fillCommonMarket(market: Market): void {
+  market.decimals = CTokenDecimals;
+  market.comptroller = DefaultComptrollerId;
   market.mintsPaused = false;
   market.borrowsPaused = false;
-  market.borrowRate = ZeroBD;
+  market.borrowAPY = ZeroBD;
+  market.borrowRatePerBlock = ZeroBD;
   market.cash = ZeroBD;
   market.collateralFactor = ZeroBD;
   market.exchangeRate = ZeroBD;
   market.interestRateModelAddress = NullAddress;
   market.numberOfBorrowers = ZeroBI;
   market.numberOfSuppliers = ZeroBI;
-  market.reserves = ZeroBD;
-  market.supplyRate = ZeroBD;
-  market.totalBorrows = ZeroBD;
+  market.totalReserves = ZeroBD;
+  market.supplyRatePerBlock = ZeroBD;
+  market.totalBorrow = ZeroBD;
   market.totalSupply = ZeroBD;
   market.underlyingPriceNative = ZeroBD;
-  market.accrualBlockNumber = ZeroBI;
-  market.blockTimestamp = ZeroBI;
+  market.creationBlockNumber = ZeroBI;
+  market.creationBlockTimestamp = ZeroBI;
+  market.latestBlockNumber = ZeroBI;
+  market.latestBlockTimestamp = ZeroBI;
   market.borrowIndex = ZeroBD;
   market.reserveFactor = ZeroBI;
   market.underlyingPriceUSD = ZeroBD;
   market.underlyingAddress = NullAddress;
   market.underlyingDecimals = 0;
-  market.compBorrowSpeed = ZeroBI;
-  market.compSupplySpeed = ZeroBI;
+  market.compSpeedBorrow = ZeroBI;
+  market.compSpeedSupply = ZeroBI;
   market.borrowCap = ZeroBI;
+  market.totalSupplyUSD = ZeroBD;
+  market.supplyAPY = ZeroBD;
+  market.totalSupplyApy = ZeroBD;
+  market.totalBorrowUSD = ZeroBD;
+  market.totalBorrowAPY = ZeroBD;
+  market.totalReservesUSD = ZeroBD;
+  market.availableLiquidity = ZeroBD;
+  market.availableLiquidityUSD = ZeroBD;
+  market.utilization = ZeroBD;
+  market.exchangeRate = ZeroBD;
 }
 
 function fillNativeMarket(market: Market): void {

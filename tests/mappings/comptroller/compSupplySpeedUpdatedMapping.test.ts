@@ -10,7 +10,7 @@ function createEvent(): CompSupplySpeedUpdated {
     new ethereum.EventParam("cToken", ethereum.Value.fromAddress(Address.fromString(MarketDefaultValues.Id)))
   );
   event.parameters.push(
-    new ethereum.EventParam("newSpeed", ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(MarketDefaultValues.CompSupplySpeed)))
+    new ethereum.EventParam("newSpeed", ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(MarketDefaultValues.CompSpeedSupply)))
   );
   return event;
 }
@@ -21,12 +21,12 @@ describe("Comptroller ::: handleCompSupplySpeedUpdated tests", () => {
   });
 
   test("It should update an existing Market", () => {
-    const market = new MarketBuilder().withCompBorrowSpeed(1234).build();
+    const market = new MarketBuilder().withCompSpeedSupply(1234).build();
     const event = createEvent();
 
     handleCompSupplySpeedUpdated(event);
 
     assert.entityCount("Market", 1);
-    assert.fieldEquals("Market", market.id, "compSupplySpeed", "0");
+    assert.fieldEquals("Market", market.id, "compSpeedSupply", "0");
   });
 });

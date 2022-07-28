@@ -39,7 +39,7 @@ export function handleRedeem(event: Redeem): void {
   redeemEvent.to = event.address;
   redeemEvent.from = event.params.redeemer;
   redeemEvent.blockNumber = event.block.number;
-  redeemEvent.blockTime = event.block.timestamp;
+  redeemEvent.blockTimestamp = event.block.timestamp;
   redeemEvent.underlyingAmount = underlyingAmount;
   redeemEvent.save();
 }
