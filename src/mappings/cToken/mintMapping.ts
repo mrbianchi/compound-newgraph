@@ -1,7 +1,8 @@
+import { log } from "@graphprotocol/graph-ts";
 import { CTokenDecimals, CTokenDecimalsBD } from "../../constants";
 import { MintEvent } from "../../types/schema";
 import { Mint } from "../../types/templates/CToken/CToken";
-import { exponentToBigDecimal, getMarket } from "../../utils";
+import { exponentToBigDecimal, getMarket, isNonFunctionalMarket } from "../../utils";
 
 /* Account supplies assets into market and receives cTokens in exchange
  *
@@ -18,6 +19,12 @@ import { exponentToBigDecimal, getMarket } from "../../utils";
  */
 export function handleMint(event: Mint): void {
   const marketId = event.address.toHexString();
+
+  if (isNonFunctionalMarket(marketId)) {
+    log.error("Non functional market {}", [marketId]);
+    return;
+  }
+
   const market = getMarket(marketId);
 
   const mintEventId = event.transaction.hash.toHexString().concat("-").concat(event.transactionLogIndex.toString());

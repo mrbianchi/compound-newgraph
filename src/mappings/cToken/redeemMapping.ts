@@ -1,7 +1,8 @@
+import { log } from "@graphprotocol/graph-ts";
 import { CTokenDecimals, CTokenDecimalsBD } from "../../constants";
 import { RedeemEvent } from "../../types/schema";
 import { Redeem } from "../../types/templates/CToken/CToken";
-import { exponentToBigDecimal, getMarket } from "../../utils";
+import { exponentToBigDecimal, getMarket, isNonFunctionalMarket } from "../../utils";
 
 /*  Account supplies cTokens into market and receives underlying asset in exchange
  *
@@ -17,6 +18,12 @@ import { exponentToBigDecimal, getMarket } from "../../utils";
  */
 export function handleRedeem(event: Redeem): void {
   const marketId = event.address.toHexString();
+
+  if (isNonFunctionalMarket(marketId)) {
+    log.error("Non functional market {}", [marketId]);
+    return;
+  }
+
   const market = getMarket(marketId);
 
   const redeemEventId = event.transaction.hash.toHexString().concat("-").concat(event.transactionLogIndex.toString());

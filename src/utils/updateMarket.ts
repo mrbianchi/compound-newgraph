@@ -1,5 +1,5 @@
-import { Address, BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
-import { CTokenDecimalsBD, MantissaFactor, MantissaFactorBD, NativeTokenDecimals, ZeroBD, cNativeAddress } from "../constants";
+import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
+import { CTokenDecimalsBD, MantissaFactor, MantissaFactorBD, NativeTokenDecimals, cNativeAddress } from "../constants";
 import { Market } from "../types/schema";
 import { CToken } from "../types/templates/CToken/CToken";
 import { exponentToBigDecimal } from "./exponentToBigDecimal";
