@@ -10,6 +10,6 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     return;
   }
 
-  const market = getMarket(marketId);
-  updateMarket(market, event.block);
+  const market = getMarket(marketId, event);
+  updateMarket(market, event);
 }

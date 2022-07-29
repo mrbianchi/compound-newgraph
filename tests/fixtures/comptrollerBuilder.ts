@@ -5,10 +5,12 @@ import { Comptroller } from "../../src/types/schema";
 export abstract class ComptrollerDefaultValues {
   public static readonly Id: string = DefaultComptrollerId;
   public static readonly PriceOracleAddress: string = "0xfafafa0000000000000000000000000000000001";
-  public static readonly LiquidationIncentiveMantissa: u64 = 13;
-  public static readonly CloseFactorMantissa: u64 = 45;
+  public static readonly LiquidationIncentive: BigDecimal = ZeroBD;
+  public static readonly CloseFactor: BigDecimal = ZeroBD;
   public static readonly TransfersPaused: boolean = false;
   public static readonly SeizesPaused: boolean = false;
+  public static readonly LatestBlockNumber: u64 = 0;
+  public static readonly LatestBlockTimestamp: u64 = 0;
   public static readonly TotalSupplyUSD: BigDecimal = ZeroBD;
   public static readonly TotalBorrowUSD: BigDecimal = ZeroBD;
   public static readonly TotalReservesUSD: BigDecimal = ZeroBD;
@@ -18,10 +20,12 @@ export abstract class ComptrollerDefaultValues {
 export class ComptrollerBuilder {
   private id: string = ComptrollerDefaultValues.Id;
   private priceOracleAddress: string = ComptrollerDefaultValues.PriceOracleAddress;
-  private liquidationIncentiveMantissa: u64 = ComptrollerDefaultValues.LiquidationIncentiveMantissa;
-  private closeFactorMantissa: u64 = ComptrollerDefaultValues.CloseFactorMantissa;
+  private liquidationIncentive: BigDecimal = ComptrollerDefaultValues.LiquidationIncentive;
+  private closeFactor: BigDecimal = ComptrollerDefaultValues.CloseFactor;
   private transfersPaused: boolean = ComptrollerDefaultValues.TransfersPaused;
   private seizesPaused: boolean = ComptrollerDefaultValues.SeizesPaused;
+  private latestBlockNumber: u64 = ComptrollerDefaultValues.LatestBlockNumber;
+  private latestBlockTimestamp: u64 = ComptrollerDefaultValues.LatestBlockTimestamp;
   private totalSupplyUSD: BigDecimal = ComptrollerDefaultValues.TotalSupplyUSD;
   private totalBorrowUSD: BigDecimal = ComptrollerDefaultValues.TotalBorrowUSD;
   private totalReservesUSD: BigDecimal = ComptrollerDefaultValues.TotalReservesUSD;
@@ -30,11 +34,13 @@ export class ComptrollerBuilder {
   build(): Comptroller {
     const entity = new Comptroller(this.id);
     entity.priceOracleAddress = Bytes.fromHexString(this.priceOracleAddress);
-    entity.liquidationIncentiveMantissa = BigInt.fromU64(this.liquidationIncentiveMantissa);
-    entity.closeFactorMantissa = BigInt.fromU64(this.closeFactorMantissa);
+    entity.liquidationIncentive = this.liquidationIncentive;
+    entity.closeFactor = this.closeFactor;
     entity.transfersPaused = this.transfersPaused;
     entity.seizesPaused = this.seizesPaused;
     entity.totalSupplyUSD = this.totalSupplyUSD;
+    entity.latestBlockNumber = BigInt.fromU64(this.latestBlockNumber);
+    entity.latestBlockTimestamp = BigInt.fromU64(this.latestBlockTimestamp);
     entity.totalBorrowUSD = this.totalBorrowUSD;
     entity.totalReservesUSD = this.totalReservesUSD;
     entity.utilization = this.utilization;
@@ -53,13 +59,13 @@ export class ComptrollerBuilder {
     return this;
   }
 
-  withLiquidationIncentiveMantissa(liquidationIncentiveMantissa: u64): ComptrollerBuilder {
-    this.liquidationIncentiveMantissa = liquidationIncentiveMantissa;
+  withLiquidationIncentive(liquidationIncentive: BigDecimal): ComptrollerBuilder {
+    this.liquidationIncentive = liquidationIncentive;
     return this;
   }
 
-  withCloseFactorMantissa(closeFactorMantissa: u64): ComptrollerBuilder {
-    this.closeFactorMantissa = closeFactorMantissa;
+  withCloseFactor(closeFactor: BigDecimal): ComptrollerBuilder {
+    this.closeFactor = closeFactor;
     return this;
   }
 

@@ -1,6 +1,8 @@
 import { log } from "@graphprotocol/graph-ts";
+import { MantissaFactor } from "../../constants";
 import { CompBorrowSpeedUpdated } from "../../types/Comptroller/Comptroller";
 import { getMarket, isNonFunctionalMarket } from "../../utils";
+import { amountToDecimal } from "../../utils/amountToDecimal";
 
 export function handleCompBorrowSpeedUpdated(event: CompBorrowSpeedUpdated): void {
   const marketId = event.params.cToken.toHexString();
@@ -10,7 +12,7 @@ export function handleCompBorrowSpeedUpdated(event: CompBorrowSpeedUpdated): voi
     return;
   }
 
-  const market = getMarket(marketId);
-  market.compSpeedBorrow = event.params.newSpeed;
+  const market = getMarket(marketId, event);
+  market.compSpeedBorrow = amountToDecimal(event.params.newSpeed, MantissaFactor);
   market.save();
 }

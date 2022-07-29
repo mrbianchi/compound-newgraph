@@ -1,8 +1,9 @@
 import { BigInt, log } from "@graphprotocol/graph-ts";
-import { CTokenDecimals, CTokenDecimalsBD } from "../../constants";
+import { CTokenDecimals } from "../../constants";
 import { LiquidationEvent } from "../../types/schema";
 import { LiquidateBorrow } from "../../types/templates/CToken/CToken";
 import { exponentToBigDecimal, getAccount, getMarket, isNonFunctionalMarket } from "../../utils";
+import { amountToDecimal } from "../../utils/amountToDecimal";
 
 /*
  * Liquidate an account who has fell below the collateral factor.
@@ -36,10 +37,10 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
     return;
   }
 
-  const market = getMarket(marketId);
-  const collateralMarket = getMarket(collateralMarketId);
-  const liquidatorAccount = getAccount(liquidatorId);
-  const borrowerAccount = getAccount(borrowerId);
+  const market = getMarket(marketId, event);
+  const collateralMarket = getMarket(collateralMarketId, event);
+  const liquidatorAccount = getAccount(liquidatorId, event);
+  const borrowerAccount = getAccount(borrowerId, event);
 
   liquidatorAccount.countLiquidator = liquidatorAccount.countLiquidator.plus(BigInt.fromU64(1));
   borrowerAccount.countLiquidated = borrowerAccount.countLiquidated.plus(BigInt.fromU64(1));
@@ -53,7 +54,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   // asset. They seize one of potentially many types of cToken collateral of
   // the underwater borrower. So we must get that address from the event, and
   // the repay token is the event.address
-  const cTokenAmount = event.params.seizeTokens.toBigDecimal().div(CTokenDecimalsBD).truncate(CTokenDecimals);
+  const cTokenAmount = amountToDecimal(event.params.seizeTokens, CTokenDecimals);
   const underlyingRepayAmount = event.params.repayAmount
     .toBigDecimal()
     .div(exponentToBigDecimal(market.underlyingDecimals))

@@ -11,8 +11,8 @@ export function handleMarketEntered(event: MarketEntered): void {
     return;
   }
 
-  const accountMarket = getAccountMarket(accountId, marketId);
-  addTransactionToAccountMarket(accountMarket, event.block, event.transaction, event.transactionLogIndex);
+  const accountMarket = getAccountMarket(accountId, marketId, event);
+  addTransactionToAccountMarket(accountMarket, event);
   accountMarket.enteredMarket = true;
   accountMarket.save();
 }

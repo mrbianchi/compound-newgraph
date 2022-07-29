@@ -11,7 +11,7 @@ export function handleMarketActionPaused(event: ActionPaused1): void {
     return;
   }
 
-  const market = getMarket(marketId);
+  const market = getMarket(marketId, event);
 
   if (event.params.action == MarketActionTypes.Mint) {
     market.mintsPaused = event.params.pauseState;

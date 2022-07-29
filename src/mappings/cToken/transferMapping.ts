@@ -1,5 +1,5 @@
 import { BigInt, log } from "@graphprotocol/graph-ts";
-import { CTokenDecimals, CTokenDecimalsBD, ZeroBD } from "../../constants";
+import { CTokenDecimals, ZeroBD } from "../../constants";
 import { TransferEvent } from "../../types/schema";
 import { Transfer } from "../../types/templates/CToken/CToken";
 import {
@@ -8,8 +8,12 @@ import {
   getAccountMarket,
   getMarket,
   isNonFunctionalMarket,
+  updateComptrollerHistoricalData,
+  updateComptrollerlSummaryData,
   updateMarket,
+  updateMarketHistoricalData,
 } from "../../utils";
+import { amountToDecimal } from "../../utils/amountToDecimal";
 
 /* Transferring of cTokens
  *
@@ -38,25 +42,23 @@ export function handleTransfer(event: Transfer): void {
     return;
   }
 
-  let market = getMarket(marketId);
-  market = updateMarket(market, event.block);
+  let market = getMarket(marketId, event);
+  market = updateMarket(market, event);
 
-  const amountUnderlying = market.exchangeRate.times(event.params.amount.toBigDecimal().div(CTokenDecimalsBD));
+  const amountUnderlying = market.exchangeRate.times(amountToDecimal(event.params.amount, CTokenDecimals));
   const amountUnderylingTruncated = amountUnderlying.truncate(market.underlyingDecimals);
 
   // Checking if the tx is FROM the cToken contract (i.e. this will not run when minting)
   // If so, it is a mint, and we don't need to run these calculations
   if (accountFromId != marketId) {
-    const accountFrom = getAccount(accountFromId);
-    const accountMarketFrom = getAccountMarket(accountFromId, marketId);
+    const accountFrom = getAccount(accountFromId, event);
+    const accountMarketFrom = getAccountMarket(accountFromId, marketId, event);
 
     // Update cTokenStats common for all events, and return the stats to update unique
     // values for each event
-    addTransactionToAccountMarket(accountMarketFrom, event.block, event.transaction, event.transactionLogIndex);
+    addTransactionToAccountMarket(accountMarketFrom, event);
 
-    accountMarketFrom.balance = accountMarketFrom.balance.minus(
-      event.params.amount.toBigDecimal().div(CTokenDecimalsBD).truncate(CTokenDecimals)
-    );
+    accountMarketFrom.balance = accountMarketFrom.balance.minus(amountToDecimal(event.params.amount, CTokenDecimals));
 
     accountMarketFrom.totalUnderlyingRedeemed = accountMarketFrom.totalUnderlyingRedeemed.plus(amountUnderylingTruncated);
     accountMarketFrom.save();
@@ -74,17 +76,15 @@ export function handleTransfer(event: Transfer): void {
   // cTokens to a cToken contract, where it will not get recorded. Right now it would
   // be messy to include, so we are leaving it out for now TODO fix this in future
   if (accountToId != marketId) {
-    const accountTo = getAccount(accountToId);
-    const accountMarketTo = getAccountMarket(accountToId, marketId);
+    const accountTo = getAccount(accountToId, event);
+    const accountMarketTo = getAccountMarket(accountToId, marketId, event);
 
     // Update cTokenStats common for all events, and return the stats to update unique
     // values for each event
-    addTransactionToAccountMarket(accountMarketTo, event.block, event.transaction, event.transactionLogIndex);
+    addTransactionToAccountMarket(accountMarketTo, event);
 
     const previousCTokenBalanceTo = accountMarketTo.balance;
-    accountMarketTo.balance = accountMarketTo.balance.plus(
-      event.params.amount.toBigDecimal().div(CTokenDecimalsBD).truncate(CTokenDecimals)
-    );
+    accountMarketTo.balance = accountMarketTo.balance.plus(amountToDecimal(event.params.amount, CTokenDecimals));
 
     accountMarketTo.totalUnderlyingSupplied = accountMarketTo.totalUnderlyingSupplied.plus(amountUnderylingTruncated);
     accountMarketTo.save();
@@ -105,6 +105,10 @@ export function handleTransfer(event: Transfer): void {
   transferEvent.blockTimestamp = event.block.timestamp;
   transferEvent.from = event.params.from;
   transferEvent.to = event.params.to;
-  transferEvent.amount = event.params.amount.toBigDecimal().div(CTokenDecimalsBD);
+  transferEvent.amount = amountToDecimal(event.params.amount, CTokenDecimals);
   transferEvent.save();
+
+  updateComptrollerlSummaryData(event);
+  updateMarketHistoricalData(event);
+  updateComptrollerHistoricalData(event);
 }

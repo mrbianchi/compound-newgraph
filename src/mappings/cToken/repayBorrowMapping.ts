@@ -34,12 +34,12 @@ export function handleRepayBorrow(event: RepayBorrow): void {
     return;
   }
 
-  const market = getMarket(marketId);
-  const accountMarket = getAccountMarket(accountId, marketId);
+  const market = getMarket(marketId, event);
+  const accountMarket = getAccountMarket(accountId, marketId, event);
 
   // Update cTokenStats common for all events, and return the stats to update unique
   // values for each event
-  addTransactionToAccountMarket(accountMarket, event.block, event.transaction, event.transactionLogIndex);
+  addTransactionToAccountMarket(accountMarket, event);
 
   const accountBorrows = event.params.accountBorrows
     .toBigDecimal()
@@ -55,7 +55,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   accountMarket.totalUnderlyingRepaid = accountMarket.totalUnderlyingRepaid.plus(repayAmount);
   accountMarket.save();
 
-  const account = getAccount(accountId);
+  const account = getAccount(accountId, event);
 
   if (accountMarket.storedBorrowBalance.equals(ZeroBD)) {
     market.numberOfBorrowers = market.numberOfBorrowers.minus(BigInt.fromU64(1));

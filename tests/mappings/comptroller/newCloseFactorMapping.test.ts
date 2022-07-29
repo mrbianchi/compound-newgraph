@@ -1,4 +1,4 @@
-import { BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { assert, beforeEach, clearStore, describe, newMockEvent, test } from "matchstick-as";
 import { handleNewCloseFactor } from "../../../src/mappings/comptroller/newCloseFactorMapping";
 import { NewCloseFactor } from "../../../src/types/Comptroller/Comptroller";
@@ -6,13 +6,11 @@ import { ComptrollerBuilder, ComptrollerDefaultValues } from "../../fixtures/com
 
 function createEvent(): NewCloseFactor {
   const event = changetype<NewCloseFactor>(newMockEvent());
-  event.parameters.push(
-    new ethereum.EventParam("oldCloseFactorMantissa", ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(0)))
-  );
+  event.parameters.push(new ethereum.EventParam("oldCloseFactor", ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(0))));
   event.parameters.push(
     new ethereum.EventParam(
-      "newCloseFactorMantissa",
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(ComptrollerDefaultValues.CloseFactorMantissa))
+      "newCloseFactor",
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(ComptrollerDefaultValues.CloseFactor))
     )
   );
   return event;
@@ -34,23 +32,18 @@ describe("Comptroller ::: handleNewCloseFactor tests", () => {
     assert.fieldEquals(
       "Comptroller",
       ComptrollerDefaultValues.Id,
-      "closeFactorMantissa",
-      ComptrollerDefaultValues.CloseFactorMantissa.toString()
+      "closeFactor",
+      ComptrollerDefaultValues.CloseFactor.toString()
     );
   });
 
   test("It should update an existing Comptroller", () => {
-    const comptroller = new ComptrollerBuilder().withCloseFactorMantissa(0).build();
+    const comptroller = new ComptrollerBuilder().withCloseFactor(BigDecimal.fromString("1")).build();
     const event = createEvent();
 
     handleNewCloseFactor(event);
 
     assert.entityCount("Comptroller", 1);
-    assert.fieldEquals(
-      "Comptroller",
-      comptroller.id,
-      "closeFactorMantissa",
-      ComptrollerDefaultValues.CloseFactorMantissa.toString()
-    );
+    assert.fieldEquals("Comptroller", comptroller.id, "closeFactor", ComptrollerDefaultValues.CloseFactor.toString());
   });
 });

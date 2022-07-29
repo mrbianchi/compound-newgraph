@@ -29,12 +29,12 @@ export function handleBorrow(event: Borrow): void {
     return;
   }
 
-  const market = getMarket(marketId);
-  const accountMarket = getAccountMarket(borrowerAccountId, marketId);
+  const market = getMarket(marketId, event);
+  const accountMarket = getAccountMarket(borrowerAccountId, marketId, event);
 
   // Update cTokenStats common for all events, and return the stats to update unique
   // values for each event
-  addTransactionToAccountMarket(accountMarket, event.block, event.transaction, event.transactionLogIndex);
+  addTransactionToAccountMarket(accountMarket, event);
 
   const accountBorrows = event.params.accountBorrows
     .toBigDecimal()
@@ -51,7 +51,7 @@ export function handleBorrow(event: Borrow): void {
   accountMarket.totalUnderlyingBorrowed = accountMarket.totalUnderlyingBorrowed.plus(borrowAmount);
   accountMarket.save();
 
-  const borrowerAccount = getAccount(borrowerAccountId);
+  const borrowerAccount = getAccount(borrowerAccountId, event);
   borrowerAccount.hasBorrowed = true;
   borrowerAccount.save();
 

@@ -1,11 +1,10 @@
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { CTokenDecimals, DefaultComptrollerId, ZeroBD } from "../../src/constants";
+import { DefaultComptrollerId, ZeroBD } from "../../src/constants";
 import { Market } from "../../src/types/schema";
 
 export abstract class MarketDefaultValues {
   public static readonly Id: string = "0xfafafa0000000000000000000000000000000001";
   public static readonly ComptrollerId: string = DefaultComptrollerId;
-  public static readonly Decimals: i32 = CTokenDecimals;
   public static readonly Name: string = "Builder Market";
   public static readonly Symbol: string = "bMarket";
   public static readonly UnderlyingName: string = "Market";
@@ -30,16 +29,16 @@ export abstract class MarketDefaultValues {
   public static readonly LatestBlockNumber: u64 = 0;
   public static readonly LatestBlockTimestamp: u64 = 0;
   public static readonly BorrowIndex: BigDecimal = ZeroBD;
-  public static readonly ReserveFactor: u64 = 0;
+  public static readonly ReserveFactor: BigDecimal = ZeroBD;
   public static readonly UnderlyingPriceUSD: BigDecimal = ZeroBD;
   public static readonly UnderlyingAddress: string = "0xfafafa0000000000000000000000000000000003";
-  public static readonly UnderlyingDecimals: number = 18;
-  public static readonly CompSpeedBorrow: u64 = 0;
-  public static readonly CompSpeedSupply: u64 = 0;
-  public static readonly BorrowCap: u64 = 0;
+  public static readonly UnderlyingDecimals: i32 = 18;
+  public static readonly CompSpeedBorrow: BigDecimal = ZeroBD;
+  public static readonly CompSpeedSupply: BigDecimal = ZeroBD;
+  public static readonly BorrowCap: BigDecimal = ZeroBD;
   public static readonly TotalSupplyUSD: BigDecimal = ZeroBD;
   public static readonly SupplyAPY: BigDecimal = ZeroBD;
-  public static readonly TotalSupplyApy: BigDecimal = ZeroBD;
+  public static readonly TotalSupplyAPY: BigDecimal = ZeroBD;
   public static readonly TotalBorrowUSD: BigDecimal = ZeroBD;
   public static readonly TotalBorrowAPY: BigDecimal = ZeroBD;
   public static readonly TotalReservesUSD: BigDecimal = ZeroBD;
@@ -51,7 +50,6 @@ export abstract class MarketDefaultValues {
 export class MarketBuilder {
   private id: string = MarketDefaultValues.Id;
   private comptrollerId: string = MarketDefaultValues.ComptrollerId;
-  private decimals: i32 = MarketDefaultValues.Decimals;
   private name: string = MarketDefaultValues.Name;
   private symbol: string = MarketDefaultValues.Symbol;
   private underlyingName: string = MarketDefaultValues.UnderlyingName;
@@ -76,16 +74,16 @@ export class MarketBuilder {
   private latestBlockNumber: u64 = MarketDefaultValues.LatestBlockNumber;
   private latestBlockTimestamp: u64 = MarketDefaultValues.LatestBlockTimestamp;
   private borrowIndex: BigDecimal = MarketDefaultValues.BorrowIndex;
-  private reserveFactor: u64 = MarketDefaultValues.ReserveFactor;
+  private reserveFactor: BigDecimal = MarketDefaultValues.ReserveFactor;
   private underlyingPriceUSD: BigDecimal = MarketDefaultValues.UnderlyingPriceUSD;
   private underlyingAddress: string = MarketDefaultValues.UnderlyingAddress;
-  private underlyingDecimals: number = MarketDefaultValues.UnderlyingDecimals;
-  private compSpeedBorrow: u64 = MarketDefaultValues.CompSpeedBorrow;
-  private compSpeedSupply: u64 = MarketDefaultValues.CompSpeedSupply;
-  private borrowCap: u64 = MarketDefaultValues.BorrowCap;
+  private underlyingDecimals: i32 = MarketDefaultValues.UnderlyingDecimals;
+  private compSpeedBorrow: BigDecimal = MarketDefaultValues.CompSpeedBorrow;
+  private compSpeedSupply: BigDecimal = MarketDefaultValues.CompSpeedSupply;
+  private borrowCap: BigDecimal = MarketDefaultValues.BorrowCap;
   private totalSupplyUSD: BigDecimal = MarketDefaultValues.TotalSupplyUSD;
   private supplyAPY: BigDecimal = MarketDefaultValues.SupplyAPY;
-  private totalSupplyApy: BigDecimal = MarketDefaultValues.TotalSupplyApy;
+  private totalSupplyAPY: BigDecimal = MarketDefaultValues.TotalSupplyAPY;
   private totalBorrowUSD: BigDecimal = MarketDefaultValues.TotalBorrowUSD;
   private totalBorrowAPY: BigDecimal = MarketDefaultValues.TotalBorrowAPY;
   private totalReservesUSD: BigDecimal = MarketDefaultValues.TotalReservesUSD;
@@ -95,7 +93,6 @@ export class MarketBuilder {
 
   build(): Market {
     const entity = new Market(this.id);
-    entity.decimals = this.decimals;
     entity.comptroller = this.comptrollerId;
     entity.name = this.name;
     entity.symbol = this.symbol;
@@ -121,16 +118,16 @@ export class MarketBuilder {
     entity.latestBlockNumber = BigInt.fromU64(this.latestBlockNumber);
     entity.latestBlockTimestamp = BigInt.fromU64(this.latestBlockTimestamp);
     entity.borrowIndex = this.borrowIndex;
-    entity.reserveFactor = BigInt.fromU64(this.reserveFactor);
+    entity.reserveFactor = this.reserveFactor;
     entity.underlyingPriceUSD = this.underlyingPriceUSD;
     entity.underlyingAddress = Address.fromString(this.underlyingAddress);
     entity.underlyingDecimals = this.underlyingDecimals as i32;
-    entity.compSpeedBorrow = BigInt.fromU64(this.compSpeedBorrow);
-    entity.compSpeedSupply = BigInt.fromU64(this.compSpeedSupply);
-    entity.borrowCap = BigInt.fromU64(this.borrowCap);
+    entity.compSpeedBorrow = this.compSpeedBorrow;
+    entity.compSpeedSupply = this.compSpeedSupply;
+    entity.borrowCap = this.borrowCap;
     entity.totalSupplyUSD = this.totalSupplyUSD;
     entity.supplyAPY = this.supplyAPY;
-    entity.totalSupplyApy = this.totalSupplyApy;
+    entity.totalSupplyAPY = this.totalSupplyAPY;
     entity.totalBorrowUSD = this.totalBorrowUSD;
     entity.totalBorrowAPY = this.totalBorrowAPY;
     entity.totalReservesUSD = this.totalReservesUSD;

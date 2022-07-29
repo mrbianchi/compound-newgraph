@@ -1,7 +1,8 @@
 import { log } from "@graphprotocol/graph-ts";
-import { MantissaFactorBD } from "../../constants";
+import { MantissaFactor } from "../../constants";
 import { NewCollateralFactor } from "../../types/Comptroller/Comptroller";
 import { getMarket, isNonFunctionalMarket } from "../../utils";
+import { amountToDecimal } from "../../utils/amountToDecimal";
 
 export function handleNewCollateralFactor(event: NewCollateralFactor): void {
   const marketId = event.params.cToken.toHexString();
@@ -11,7 +12,7 @@ export function handleNewCollateralFactor(event: NewCollateralFactor): void {
     return;
   }
 
-  const market = getMarket(marketId);
-  market.collateralFactor = event.params.newCollateralFactorMantissa.toBigDecimal().div(MantissaFactorBD);
+  const market = getMarket(marketId, event);
+  market.collateralFactor = amountToDecimal(event.params.newCollateralFactorMantissa, MantissaFactor);
   market.save();
 }

@@ -1,4 +1,4 @@
-import { BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { assert, beforeEach, clearStore, describe, newMockEvent, test } from "matchstick-as";
 import { handleNewLiquidationIncentive } from "../../../src/mappings/comptroller/newLiquidationIncentiveMapping";
 import { NewLiquidationIncentive } from "../../../src/types/Comptroller/Comptroller";
@@ -7,12 +7,12 @@ import { ComptrollerBuilder, ComptrollerDefaultValues } from "../../fixtures/com
 function createEvent(): NewLiquidationIncentive {
   const event = changetype<NewLiquidationIncentive>(newMockEvent());
   event.parameters.push(
-    new ethereum.EventParam("oldLiquidationIncentiveMantissa", ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(0)))
+    new ethereum.EventParam("oldLiquidationIncentive", ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(0)))
   );
   event.parameters.push(
     new ethereum.EventParam(
-      "newLiquidationIncentiveMantissa",
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(ComptrollerDefaultValues.LiquidationIncentiveMantissa))
+      "newLiquidationIncentive",
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(ComptrollerDefaultValues.LiquidationIncentive))
     )
   );
   return event;
@@ -34,13 +34,13 @@ describe("Comptroller ::: handleNewLiquidationIncentive tests", () => {
     assert.fieldEquals(
       "Comptroller",
       ComptrollerDefaultValues.Id,
-      "liquidationIncentiveMantissa",
-      ComptrollerDefaultValues.LiquidationIncentiveMantissa.toString()
+      "liquidationIncentive",
+      ComptrollerDefaultValues.LiquidationIncentive.toString()
     );
   });
 
   test("It should update an existing Comptroller", () => {
-    const comptroller = new ComptrollerBuilder().withLiquidationIncentiveMantissa(0).build();
+    const comptroller = new ComptrollerBuilder().withLiquidationIncentive(BigDecimal.fromString("1")).build();
     const event = createEvent();
 
     handleNewLiquidationIncentive(event);
@@ -49,8 +49,8 @@ describe("Comptroller ::: handleNewLiquidationIncentive tests", () => {
     assert.fieldEquals(
       "Comptroller",
       comptroller.id,
-      "liquidationIncentiveMantissa",
-      ComptrollerDefaultValues.LiquidationIncentiveMantissa.toString()
+      "liquidationIncentive",
+      ComptrollerDefaultValues.LiquidationIncentive.toString()
     );
   });
 });

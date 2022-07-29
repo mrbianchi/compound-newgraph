@@ -1,7 +1,7 @@
-import { Address, BigDecimal } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import {
-  CTokenDecimals,
   DefaultComptrollerId,
+  MantissaFactor,
   NativeTokenDecimals,
   NativeTokenName,
   NativeTokenSymbol,
@@ -15,43 +15,46 @@ import { cERC20Delegator } from "../types/Comptroller/cERC20Delegator";
 import { cEther } from "../types/Comptroller/cEther";
 import { Market } from "../types/schema";
 import { CToken } from "../types/templates";
+import { amountToDecimal } from "./amountToDecimal";
 
-function fillCommonMarket(market: Market): void {
-  market.decimals = CTokenDecimals;
+function fillCommonMarket(market: Market, event: ethereum.Event): void {
   market.comptroller = DefaultComptrollerId;
+  market.creationBlockNumber = event.block.number;
+  market.creationBlockTimestamp = event.block.timestamp;
+  market.latestBlockNumber = event.block.number;
+  market.latestBlockTimestamp = event.block.timestamp;
   market.mintsPaused = false;
   market.borrowsPaused = false;
-  market.borrowAPY = ZeroBD;
-  market.borrowRatePerBlock = ZeroBD;
-  market.cash = ZeroBD;
-  market.collateralFactor = ZeroBD;
-  market.exchangeRate = ZeroBD;
   market.interestRateModelAddress = NullAddress;
-  market.numberOfBorrowers = ZeroBI;
-  market.numberOfSuppliers = ZeroBI;
-  market.totalReserves = ZeroBD;
-  market.supplyRatePerBlock = ZeroBD;
-  market.totalBorrow = ZeroBD;
-  market.totalSupply = ZeroBD;
-  market.underlyingPriceNative = ZeroBD;
-  market.creationBlockNumber = ZeroBI;
-  market.creationBlockTimestamp = ZeroBI;
-  market.latestBlockNumber = ZeroBI;
-  market.latestBlockTimestamp = ZeroBI;
-  market.borrowIndex = ZeroBD;
-  market.reserveFactor = ZeroBI;
-  market.underlyingPriceUSD = ZeroBD;
+  //market.symbol = "";
+  //market.name = "";
+  market.collateralFactor = ZeroBD;
+  //market.underlyingSymbol = "";
+  //market.underlyingName = "";
   market.underlyingAddress = NullAddress;
   market.underlyingDecimals = 0;
-  market.compSpeedBorrow = ZeroBI;
-  market.compSpeedSupply = ZeroBI;
-  market.borrowCap = ZeroBI;
+  market.underlyingPriceNative = ZeroBD;
+  market.underlyingPriceUSD = ZeroBD;
+  market.numberOfSuppliers = ZeroBI;
+  market.totalSupply = ZeroBD;
   market.totalSupplyUSD = ZeroBD;
   market.supplyAPY = ZeroBD;
-  market.totalSupplyApy = ZeroBD;
+  market.supplyRatePerBlock = ZeroBD;
+  market.totalSupplyAPY = ZeroBD;
+  market.compSpeedSupply = ZeroBD;
+  market.numberOfBorrowers = ZeroBI;
+  market.totalBorrow = ZeroBD;
   market.totalBorrowUSD = ZeroBD;
+  market.borrowAPY = ZeroBD;
+  market.borrowRatePerBlock = ZeroBD;
   market.totalBorrowAPY = ZeroBD;
+  market.borrowIndex = ZeroBD;
+  market.borrowCap = ZeroBD;
+  market.compSpeedBorrow = ZeroBD;
+  market.reserveFactor = ZeroBD;
+  market.totalReserves = ZeroBD;
   market.totalReservesUSD = ZeroBD;
+  market.cash = ZeroBD;
   market.availableLiquidity = ZeroBD;
   market.availableLiquidityUSD = ZeroBD;
   market.utilization = ZeroBD;
@@ -67,7 +70,7 @@ function fillNativeMarket(market: Market): void {
   market.underlyingSymbol = NativeTokenSymbol;
 
   market.interestRateModelAddress = contract.interestRateModel();
-  market.reserveFactor = contract.reserveFactorMantissa();
+  market.reserveFactor = amountToDecimal(contract.reserveFactorMantissa(), MantissaFactor);
   market.underlyingDecimals = NativeTokenDecimals;
   market.underlyingPriceNative = BigDecimal.fromString("1");
 }
@@ -84,17 +87,17 @@ function fillERC20Market(market: Market): void {
 
   market.underlyingAddress = contract.underlying();
   market.interestRateModelAddress = contract.interestRateModel();
-  market.reserveFactor = contract.reserveFactorMantissa();
+  market.reserveFactor = amountToDecimal(contract.reserveFactorMantissa(), MantissaFactor);
   market.underlyingDecimals = underlyingContract.decimals();
 }
 
-export function createMarket(marketId: string): Market {
+export function createMarket(marketId: string, event: ethereum.Event): Market {
   const marketAddress = Address.fromString(marketId);
   const market = new Market(marketId);
 
   CToken.create(marketAddress);
 
-  fillCommonMarket(market);
+  fillCommonMarket(market, event);
 
   if (marketId == cNativeAddress) {
     // It is ctoken of native token, which has a slightly different interface

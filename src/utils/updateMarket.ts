@@ -1,66 +1,81 @@
-import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
-import { CTokenDecimalsBD, MantissaFactor, MantissaFactorBD, NativeTokenDecimals, cNativeAddress } from "../constants";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { CTokenDecimals, MantissaFactor, NativeTokenDecimals, OneBD, ZeroBD, ZeroBI, cNativeAddress } from "../constants";
 import { Market } from "../types/schema";
 import { CToken } from "../types/templates/CToken/CToken";
-import { exponentToBigDecimal } from "./exponentToBigDecimal";
+import { amountToDecimal } from "./amountToDecimal";
 import { getTokenPrice } from "./getTokenPrice";
 
-function updateCommonMarket(market: Market, block: ethereum.Block): void {
+export const SEC_PER_BLOCK = BigDecimal.fromString("13.5");
+export const SEC_PER_DAY = BigInt.fromU32(86400);
+export const BLOCK_PER_SEC = BigDecimal.fromString("1").div(SEC_PER_BLOCK);
+export const BLOCKS_PER_DAY = BLOCK_PER_SEC.times(SEC_PER_DAY.toBigDecimal());
+export const DAYS_PER_YEAR = BigInt.fromU32(365);
+
+export function calculateAPY(ratePerBlock: BigDecimal): BigDecimal {
+  const base = ratePerBlock.times(BLOCKS_PER_DAY).plus(OneBD);
+
+  let apy = BigDecimal.fromString("1");
+  for (let i = ZeroBI; i.lt(DAYS_PER_YEAR); i = i.plus(ZeroBI)) {
+    apy = apy.times(base);
+  }
+  return apy.minus(OneBD);
+}
+
+function updateCommonMarket(market: Market, event: ethereum.Event): void {
   const contractAddress = Address.fromString(market.id);
   const contract = CToken.bind(contractAddress);
-  market.latestBlockNumber = contract.accrualBlockNumber();
-  market.latestBlockTimestamp = block.timestamp;
-  market.totalSupply = contract.totalSupply().toBigDecimal().div(CTokenDecimalsBD);
 
-  /* Exchange rate explanation
-       In Practice
-        - If you call the cDAI contract on etherscan it comes back (2.0 * 10^26)
-        - If you call the cUSDC contract on etherscan it comes back (2.0 * 10^14)
-        - The real value is ~0.02. So cDAI is off by 10^28, and cUSDC 10^16
-       How to calculate for tokens with different decimals
-        - Must div by tokenDecimals, 10^market.underlyingDecimals
-        - Must multiply by ctokenDecimals, 10^8
-        - Must div by mantissa, 10^18
-     */
-  market.exchangeRate = contract
-    .exchangeRateStored()
-    .toBigDecimal()
-    .div(exponentToBigDecimal(market.underlyingDecimals))
-    .times(CTokenDecimalsBD)
-    .div(MantissaFactorBD)
-    .truncate(MantissaFactor);
-  market.borrowIndex = contract.borrowIndex().toBigDecimal().div(MantissaFactorBD).truncate(MantissaFactor);
+  market.latestBlockNumber = event.block.number; //contract.accrualBlockNumber();
+  market.latestBlockTimestamp = event.block.timestamp;
 
-  market.totalReserves = contract
-    .totalReserves()
-    .toBigDecimal()
-    .div(exponentToBigDecimal(market.underlyingDecimals))
-    .truncate(market.underlyingDecimals);
-  market.totalBorrow = contract
-    .totalBorrows()
-    .toBigDecimal()
-    .div(exponentToBigDecimal(market.underlyingDecimals))
-    .truncate(market.underlyingDecimals);
-  market.cash = contract
-    .getCash()
-    .toBigDecimal()
-    .div(exponentToBigDecimal(market.underlyingDecimals))
-    .truncate(market.underlyingDecimals);
+  market.exchangeRate = amountToDecimal(
+    contract.exchangeRateStored(),
+    MantissaFactor + market.underlyingDecimals - CTokenDecimals
+  );
 
-  // Must convert to BigDecimal, and remove 10^18 that is used for Exp in Compound Solidity
-  market.borrowRatePerBlock = contract
-    .borrowRatePerBlock()
-    .toBigDecimal()
-    .times(BigDecimal.fromString("2102400"))
-    .div(MantissaFactorBD)
-    .truncate(MantissaFactor);
+  //market.numberOfSuppliers = ZeroBI;
+  market.totalSupply = amountToDecimal(contract.totalSupply(), CTokenDecimals).times(market.exchangeRate);
+  market.totalSupplyUSD = market.totalSupply.times(market.underlyingPriceUSD);
+  market.supplyRatePerBlock = amountToDecimal(contract.supplyRatePerBlock(), MantissaFactor); //TODO .times(BigDecimal.fromString("2102400"))
+  market.supplyAPY = calculateAPY(market.supplyRatePerBlock);
+  //market.totalSupplyAPY = market.supplyAPY.plus(compSupplyAPY); //TODO
+  //market.compSpeedSupply = ZeroBI;
+  //market.numberOfBorrowers = ZeroBI;
+  market.totalBorrow = amountToDecimal(contract.totalBorrows(), market.underlyingDecimals);
+  market.totalBorrowUSD = market.totalBorrow.times(market.underlyingPriceUSD);
+  market.borrowRatePerBlock = amountToDecimal(contract.borrowRatePerBlock(), MantissaFactor); //TODO .times(BigDecimal.fromString("2102400"))
+  market.borrowAPY = calculateAPY(market.borrowRatePerBlock);
+  //market.totalBorrowAPY = market.borrowAPY.minus(compBorrowAPY); //TODO
+  market.borrowIndex = amountToDecimal(contract.borrowIndex(), MantissaFactor);
+  //market.borrowCap = amountToDecimal(tryBorrowCaps.value, BigInt.fromU32(18));
+  //market.compSpeedBorrow = amountToDecimal(tryCompSpeeds.value, BigInt.fromU32(18));
+  market.reserveFactor = amountToDecimal(contract.reserveFactorMantissa(), MantissaFactor);
+  market.totalReserves = amountToDecimal(contract.totalReserves(), market.underlyingDecimals);
+  market.totalReservesUSD = market.totalReserves.times(market.underlyingPriceUSD);
+  market.cash = amountToDecimal(contract.getCash(), market.underlyingDecimals);
 
-  market.supplyRatePerBlock = contract
-    .supplyRatePerBlock()
-    .toBigDecimal()
-    .times(BigDecimal.fromString("2102400"))
-    .div(MantissaFactorBD)
-    .truncate(MantissaFactor);
+  let availableLiquidity = market.totalSupply.times(market.collateralFactor).minus(market.totalBorrow);
+
+  // Clamp to min of 0
+  if (availableLiquidity.lt(ZeroBD)) {
+    availableLiquidity = ZeroBD;
+  }
+
+  // If there is a borrow cap, inforce it
+  if (market.borrowCap.notEqual(ZeroBD)) {
+    const capLeft = market.totalBorrow.gt(market.borrowCap) ? ZeroBD : market.borrowCap.minus(market.totalBorrow);
+    if (availableLiquidity.gt(capLeft)) {
+      availableLiquidity = capLeft;
+    }
+  }
+
+  market.availableLiquidity = availableLiquidity;
+  market.availableLiquidityUSD = market.availableLiquidity.times(market.underlyingPriceUSD);
+
+  market.utilization = ZeroBD;
+  if (market.totalSupply.notEqual(ZeroBD)) {
+    market.utilization = market.totalBorrow.div(market.totalSupply);
+  }
 }
 
 function updateNativeMarket(market: Market): void {
@@ -79,13 +94,11 @@ function updateERC20Market(market: Market): void {
   market.underlyingPriceUSD = tokenPriceUSD.truncate(market.underlyingDecimals);
 }
 
-export function updateMarket(market: Market, block: ethereum.Block): Market {
+export function updateMarket(market: Market, event: ethereum.Event): Market {
   // Only updateMarket if it has not been updated this block
-  if (market.latestBlockNumber == block.number) {
+  if (market.latestBlockNumber == event.block.number) {
     return market;
   }
-
-  updateCommonMarket(market, block);
 
   if (market.id == cNativeAddress) {
     // It is ctoken of native token, we only update USD price
@@ -93,6 +106,8 @@ export function updateMarket(market: Market, block: ethereum.Block): Market {
   } else {
     updateERC20Market(market);
   }
+
+  updateCommonMarket(market, event);
 
   market.save();
 

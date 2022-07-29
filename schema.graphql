@@ -5,16 +5,22 @@ type Comptroller @entity {
   priceOracleAddress: Bytes!
   
   "Current factor used to determine repayAmount for liquidating"
-  closeFactorMantissa: BigInt!
+  closeFactor: BigDecimal!
   
   "The current percent bonus liquidators get for liquidating"
-  liquidationIncentiveMantissa: BigInt!
+  liquidationIncentive: BigDecimal!
   
   "Transfers paused globally"
   transfersPaused: Boolean!
   
   "Seizes paused globally"
   seizesPaused: Boolean!
+
+  "Most recent block number where summary data was updated"
+  latestBlockNumber: BigInt!
+  
+  "Most recent block timestamp where summary data was updated"
+  latestBlockTimestamp: BigInt!
   
   "Total supply of the entire protocol in USD"
   totalSupplyUSD: BigDecimal!
@@ -61,19 +67,19 @@ type Market @entity {
   "Market address"
   id: String!
 
-  "Relation to comptroller (new)"
+  "Relation to comptroller"
   comptroller: String!
   
-  "Block number when the market was created (new)"
+  "Block number when the market was created"
   creationBlockNumber: BigInt!
 
-  "Block timestamp when the market was created (new)"
+  "Block timestamp when the market was created"
   creationBlockTimestamp: BigInt!
   
-  "Most recent block number where the market was updated (new)"
+  "Most recent block number where the market was updated"
   latestBlockNumber: BigInt!
   
-  "Most recent block timestamp where the market was updated (new)"
+  "Most recent block timestamp where the market was updated"
   latestBlockTimestamp: BigInt!
   
   "Mints paused"
@@ -90,9 +96,6 @@ type Market @entity {
   
   "Market name"
   name: String!
-
-  "Market decimal length (new)"
-  decimals: Int!
 
   "Collateral factor determining how much one can borrow"
   collateralFactor: BigDecimal!
@@ -118,23 +121,23 @@ type Market @entity {
   "Number of suppliers active in the market"
   numberOfSuppliers: BigInt!
   
-  "Total amount of underlying tokens supplied (new)"
+  "Total amount of underlying tokens supplied"
   totalSupply: BigDecimal!
   
-  "Total amount of underlying tokens supplied in USD (new)"
+  "Total amount of underlying tokens supplied in USD"
   totalSupplyUSD: BigDecimal!
 
-  "Supply APY not including the COMP distribution in decimal form (new)"
+  "Supply APY not including the COMP distribution in decimal form"
   supplyAPY: BigDecimal!
 
-  "Supply rate per block, this is the value from the contract with the 10^18 scaling removed (new)"
+  "Supply rate per block, this is the value from the contract with the 10^18 scaling removed"
   supplyRatePerBlock: BigDecimal!
 
-  "Total supply apy including the COMP distribution in decimal form (new)"
-  totalSupplyApy: BigDecimal!
+  "Total supply apy including the COMP distribution in decimal form"
+  totalSupplyAPY: BigDecimal!
 
   "COMP distribution per block for suppliers, this is the value from the contract with the 10^18 scaling removed"
-  compSpeedSupply: BigInt!
+  compSpeedSupply: BigDecimal!
   
   "Number of borrowers active in the market"
   numberOfBorrowers: BigInt!
@@ -145,43 +148,43 @@ type Market @entity {
   "Total amount of underlying tokens borrowed in USD"
   totalBorrowUSD: BigDecimal!
 
-  "Borrow APY not including the COMP distribution in decimal form (new)"
+  "Borrow APY not including the COMP distribution in decimal form"
   borrowAPY: BigDecimal!
 
-  "Borrow rate per block, this is the value from the contract with the 10^18 scaling removed (new)"
+  "Borrow rate per block, this is the value from the contract with the 10^18 scaling removed"
   borrowRatePerBlock: BigDecimal!
 
-  "Total borrow APY including the COMP distribution in decimal form (new)"
+  "Total borrow APY including the COMP distribution in decimal form"
   totalBorrowAPY: BigDecimal!
 
   "The history of the markets borrow index return (Think S&P 500)"
   borrowIndex: BigDecimal!
 
   "borrow cap in underlying tokens"
-  borrowCap: BigInt!
+  borrowCap: BigDecimal!
 
   "COMP distribution per block for borrowers, this is the value from the contract with the 10^18 scaling removed"
-  compSpeedBorrow: BigInt!
+  compSpeedBorrow: BigDecimal!
 
-  "The factor determining interest that goes to reserves (new)"
-  reserveFactor: BigInt!
+  "The factor determining interest that goes to reserves"
+  reserveFactor: BigDecimal!
 
-  "Total amount of underlying token in reserves (new)"
+  "Total amount of underlying token in reserves"
   totalReserves: BigDecimal!
 
-  "Total amount of underlying token in reserves in USD (new)"
+  "Total amount of underlying token in reserves in USD"
   totalReservesUSD: BigDecimal!
 
   "The market contract balance of ERC20 or native token"
   cash: BigDecimal!
 
-  "Total available to be borrowed in the underlying asset (new)"
+  "Total available to be borrowed in the underlying asset"
   availableLiquidity: BigDecimal!
   
-  "Total available to be borrowed in the underlying asset in USD (new)"
+  "Total available to be borrowed in the underlying asset in USD"
   availableLiquidityUSD: BigDecimal!
   
-  "Utilization of the market (new)"
+  "Utilization of the market"
   utilization: BigDecimal!
 
   "Exchange rate of underlying tokens / cTokens"
@@ -211,28 +214,28 @@ type MarketHourData @entity {
   underlyingPriceUSD: BigDecimal!
   
   "Number of suppliers active in the market"
-  numberOfSuppliers: BigInt!
+  numberOfSuppliers: BigDecimal!
   
-  "Total amount of underlying tokens supplied (new)"
+  "Total amount of underlying tokens supplied"
   totalSupply: BigDecimal!
   
-  "Total amount of underlying tokens supplied in USD (new)"
+  "Total amount of underlying tokens supplied in USD"
   totalSupplyUSD: BigDecimal!
 
-  "Supply APY not including the COMP distribution in decimal form (new)"
+  "Supply APY not including the COMP distribution in decimal form"
   supplyAPY: BigDecimal!
 
-  "Supply rate per block, this is the value from the contract with the 10^18 scaling removed (new)"
+  "Supply rate per block, this is the value from the contract with the 10^18 scaling removed"
   supplyRatePerBlock: BigDecimal!
 
-  "Total supply apy including the COMP distribution in decimal form (new)"
-  totalSupplyApy: BigDecimal!
+  "Total supply apy including the COMP distribution in decimal form"
+  totalSupplyAPY: BigDecimal!
 
   "COMP distribution per block for suppliers, this is the value from the contract with the 10^18 scaling removed"
-  compSpeedSupply: BigInt!
+  compSpeedSupply: BigDecimal!
   
   "Number of borrowers active in the market"
-  numberOfBorrowers: BigInt!
+  numberOfBorrowers: BigDecimal!
 
   "Total amount of underlying tokens borrowed"
   totalBorrow: BigDecimal!
@@ -240,43 +243,43 @@ type MarketHourData @entity {
   "Total amount of underlying tokens borrowed in USD"
   totalBorrowUSD: BigDecimal!
 
-  "Borrow APY not including the COMP distribution in decimal form (new)"
+  "Borrow APY not including the COMP distribution in decimal form"
   borrowAPY: BigDecimal!
 
-  "Borrow rate per block, this is the value from the contract with the 10^18 scaling removed (new)"
+  "Borrow rate per block, this is the value from the contract with the 10^18 scaling removed"
   borrowRatePerBlock: BigDecimal!
 
-  "Total borrow APY including the COMP distribution in decimal form (new)"
+  "Total borrow APY including the COMP distribution in decimal form"
   totalBorrowAPY: BigDecimal!
 
   "The history of the markets borrow index return (Think S&P 500)"
   borrowIndex: BigDecimal!
 
   "borrow cap in underlying tokens"
-  borrowCap: BigInt!
+  borrowCap: BigDecimal!
 
   "COMP distribution per block for borrowers, this is the value from the contract with the 10^18 scaling removed"
-  compSpeedBorrow: BigInt!
+  compSpeedBorrow: BigDecimal!
 
-  "The factor determining interest that goes to reserves (new)"
-  reserveFactor: BigInt!
+  "The factor determining interest that goes to reserves"
+  reserveFactor: BigDecimal!
 
-  "Total amount of underlying token in reserves (new)"
+  "Total amount of underlying token in reserves"
   totalReserves: BigDecimal!
 
-  "Total amount of underlying token in reserves in USD (new)"
+  "Total amount of underlying token in reserves in USD"
   totalReservesUSD: BigDecimal!
 
   "The market contract balance of ERC20 or native token"
   cash: BigDecimal!
 
-  "Total available to be borrowed in the underlying asset (new)"
+  "Total available to be borrowed in the underlying asset"
   availableLiquidity: BigDecimal!
   
-  "Total available to be borrowed in the underlying asset in USD (new)"
+  "Total available to be borrowed in the underlying asset in USD"
   availableLiquidityUSD: BigDecimal!
   
-  "Utilization of the market (new)"
+  "Utilization of the market"
   utilization: BigDecimal!
 
   "Exchange rate of underlying tokens / cTokens"
@@ -506,16 +509,16 @@ type Account @entity {
   "Account address"
   id: String!
 
-  "Block number when the account was created (new)"
+  "Block number when the account was created"
   creationBlockNumber: BigInt!
 
-  "Block timestamp when the account was created (new)"
+  "Block timestamp when the account was created"
   creationBlockTimestamp: BigInt!
   
-  "Most recent block number where the account was updated (new)"
+  "Most recent block number where the account was updated"
   latestBlockNumber: BigInt!
   
-  "Most recent block timestamp where the account was updated (new)"
+  "Most recent block timestamp where the account was updated"
   latestBlockTimestamp: BigInt!
 
   "Count user has been liquidated"
@@ -527,13 +530,13 @@ type Account @entity {
   "True if user has ever borrowed"
   hasBorrowed: Boolean!
   
-  "If less than 1, the account can be liquidated (new)"
+  "If less than 1, the account can be liquidated"
   health: BigDecimal!
   
-  "aggregate total of all supplied tokens by the user in all markets in USD (new)"
+  "aggregate total of all supplied tokens by the user in all markets in USD"
   totalSupplyUSD: BigDecimal!
   
-  "aggregate total of all borrowed tokens by the user in all markets in USD (new)"
+  "aggregate total of all borrowed tokens by the user in all markets in USD"
   totalBorrowUSD: BigDecimal!
 
   "Array of markets user is in"
@@ -550,20 +553,17 @@ type AccountMarket @entity {
   "Relation to account"
   account: Account!
 
-  "Block number when the account market was created (new)"
+  "Block number when the account market was created"
   creationBlockNumber: BigInt!
 
-  "Block timestamp when the account market was created (new)"
+  "Block timestamp when the account market was created"
   creationBlockTimestamp: BigInt!
   
-  "Most recent block number where the account market was updated (new)"
+  "Most recent block number where the account market was updated"
   latestBlockNumber: BigInt!
   
-  "Most recent block timestamp where the account market was updated (new)"
+  "Most recent block timestamp where the account market was updated"
   latestBlockTimestamp: BigInt!
-
-  "Block number this asset was updated at in the contract"
-  accrualBlockNumber: BigInt!
   
   "True if user is entered, false if they are exited"
   enteredMarket: Boolean!
@@ -592,11 +592,11 @@ type AccountMarket @entity {
   "Total amount underlying repaid"
   totalUnderlyingRepaid: BigDecimal!
   
-  "Current borrow balance stored in contract (exclusive of interest since accrualBlockNumber)"
+  "Current borrow balance stored in contract (exclusive of interest since latestBlockNumber)"
   storedBorrowBalance: BigDecimal!
 
-  "Array of transactions"
-  transactions: [AccountMarketTransaction!]! @derivedFrom(field: "accountMarket")
+  #"Array of transactions"
+  #transactions: [AccountMarketTransaction!]! @derivedFrom(field: "accountMarket")
 
   # The following values are added by the JS Wrapper, and must be calculated with the most up
   # to date values based on the block delta for market.exchangeRate and market.borrowIndex

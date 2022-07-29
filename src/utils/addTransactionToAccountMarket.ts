@@ -1,17 +1,12 @@
-import { BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { ethereum } from "@graphprotocol/graph-ts";
 import { AccountMarket, AccountMarketTransaction } from "../types/schema";
 
-export function addTransactionToAccountMarket(
-  accountMarket: AccountMarket,
-  block: ethereum.Block,
-  transaction: ethereum.Transaction,
-  transactionLogIndex: BigInt
-): void {
+export function addTransactionToAccountMarket(accountMarket: AccountMarket, event: ethereum.Event): void {
   const id = accountMarket.id
     .concat("-")
-    .concat(transaction.hash.toHexString())
+    .concat(event.transaction.hash.toHexString())
     .concat("-")
-    .concat(transactionLogIndex.toString());
+    .concat(event.transactionLogIndex.toString());
   let accountMarketTransaction = AccountMarketTransaction.load(id);
 
   if (accountMarketTransaction != null) {
@@ -20,9 +15,9 @@ export function addTransactionToAccountMarket(
 
   accountMarketTransaction = new AccountMarketTransaction(id);
   accountMarketTransaction.accountMarket = accountMarket.id;
-  accountMarketTransaction.transactionLogIndex = transactionLogIndex;
-  accountMarketTransaction.blockNumber = block.number;
-  accountMarketTransaction.blockTimestamp = block.timestamp;
-  accountMarketTransaction.transactionHash = transaction.hash;
+  accountMarketTransaction.transactionLogIndex = event.transactionLogIndex;
+  accountMarketTransaction.blockNumber = event.block.number;
+  accountMarketTransaction.blockTimestamp = event.block.timestamp;
+  accountMarketTransaction.transactionHash = event.transaction.hash;
   accountMarketTransaction.save();
 }

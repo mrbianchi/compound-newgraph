@@ -1,8 +1,9 @@
 import { log } from "@graphprotocol/graph-ts";
-import { CTokenDecimals, CTokenDecimalsBD } from "../../constants";
+import { CTokenDecimals } from "../../constants";
 import { MintEvent } from "../../types/schema";
 import { Mint } from "../../types/templates/CToken/CToken";
 import { exponentToBigDecimal, getMarket, isNonFunctionalMarket } from "../../utils";
+import { amountToDecimal } from "../../utils/amountToDecimal";
 
 /* Account supplies assets into market and receives cTokens in exchange
  *
@@ -25,14 +26,11 @@ export function handleMint(event: Mint): void {
     return;
   }
 
-  const market = getMarket(marketId);
+  const market = getMarket(marketId, event);
 
   const mintEventId = event.transaction.hash.toHexString().concat("-").concat(event.transactionLogIndex.toString());
-  const cTokenAmount = event.params.mintTokens.toBigDecimal().div(CTokenDecimalsBD).truncate(CTokenDecimals);
-  const underlyingAmount = event.params.mintAmount
-    .toBigDecimal()
-    .div(exponentToBigDecimal(market.underlyingDecimals))
-    .truncate(market.underlyingDecimals);
+  const cTokenAmount = amountToDecimal(event.params.mintTokens, CTokenDecimals);
+  const underlyingAmount = amountToDecimal(event.params.mintAmount, market.underlyingDecimals);
 
   const mintEvent = new MintEvent(mintEventId);
   mintEvent.market = marketId;

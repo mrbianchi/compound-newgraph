@@ -10,6 +10,6 @@ export function handleMarketListed(event: MarketListed): void {
     return;
   }
 
-  const market = createMarket(marketId);
+  const market = createMarket(marketId, event);
   market.save();
 }

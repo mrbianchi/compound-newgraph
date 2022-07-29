@@ -10,7 +10,7 @@ export function handleNewMarketInterestRateModel(event: NewMarketInterestRateMod
     return;
   }
 
-  const market = getMarket(marketId);
+  const market = getMarket(marketId, event);
   market.interestRateModelAddress = event.params.newInterestRateModel;
   market.save();
 }
