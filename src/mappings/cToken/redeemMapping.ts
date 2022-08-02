@@ -29,10 +29,7 @@ export function handleRedeem(event: Redeem): void {
 
   const redeemEventId = event.transaction.hash.toHexString().concat("-").concat(event.transactionLogIndex.toString());
   const cTokenAmount = amountToDecimal(event.params.redeemTokens, CTokenDecimals);
-  const underlyingAmount = event.params.redeemAmount
-    .toBigDecimal()
-    .div(exponentToBigDecimal(market.underlyingDecimals))
-    .truncate(market.underlyingDecimals);
+  const underlyingAmount = event.params.redeemAmount.toBigDecimal().div(exponentToBigDecimal(market.underlyingDecimals));
 
   const redeemEvent = new RedeemEvent(redeemEventId);
   redeemEvent.market = marketId;

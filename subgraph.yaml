@@ -17,18 +17,22 @@ dataSources:
         - Comptroller
         - Market
       abis:
+        - name: cERC20Delegator
+          file: ./abis/cERC20Delegator.json
+        - name: cEther
+          file: ./abis/cEther.json
+        - name: Comp
+          file: ./abis/comp.json
         - name: Comptroller
           file: ./abis/comptroller.json
         - name: CToken
           file: ./abis/cToken.json
-        - name: PriceOracle
-          file: ./abis/priceOracle.json
         - name: ERC20
           file: ./abis/erc20.json
-        - name: cEther
-          file: ./abis/cEther.json
-        - name: cERC20Delegator
-          file: ./abis/cERC20Delegator.json
+        - name: GovernorBravoDelegator
+          file: ./abis/governorBravoDelegator.json
+        - name: PriceOracle
+          file: ./abis/priceOracle.json
       eventHandlers:
         - event: Failure(uint256,uint256,uint256)
           handler: handleFailure
@@ -72,8 +76,22 @@ dataSources:
       entities:
         - Comp
       abis:
+        - name: cERC20Delegator
+          file: ./abis/cERC20Delegator.json
+        - name: cEther
+          file: ./abis/cEther.json
         - name: Comp
           file: ./abis/comp.json
+        - name: Comptroller
+          file: ./abis/comptroller.json
+        - name: CToken
+          file: ./abis/cToken.json
+        - name: ERC20
+          file: ./abis/erc20.json
+        - name: GovernorBravoDelegator
+          file: ./abis/governorBravoDelegator.json
+        - name: PriceOracle
+          file: ./abis/priceOracle.json
       eventHandlers:
         - event: DelegateChanged(indexed address,indexed address,indexed address)
           handler: handleDelegateChanged
@@ -95,8 +113,22 @@ dataSources:
       entities:
         - GovernorBravoDelegator
       abis:
+        - name: cERC20Delegator
+          file: ./abis/cERC20Delegator.json
+        - name: cEther
+          file: ./abis/cEther.json
+        - name: Comp
+          file: ./abis/comp.json
+        - name: Comptroller
+          file: ./abis/comptroller.json
+        - name: CToken
+          file: ./abis/cToken.json
+        - name: ERC20
+          file: ./abis/erc20.json
         - name: GovernorBravoDelegator
           file: ./abis/governorBravoDelegator.json
+        - name: PriceOracle
+          file: ./abis/priceOracle.json
       eventHandlers:
         - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
           handler: handleProposalCreated
@@ -131,14 +163,20 @@ templates:
       entities:
         - Market
       abis:
+        - name: cERC20Delegator
+          file: ./abis/cERC20Delegator.json
+        - name: cEther
+          file: ./abis/cEther.json
+        - name: Comp
+          file: ./abis/comp.json
+        - name: Comptroller
+          file: ./abis/comptroller.json
         - name: CToken
           file: ./abis/cToken.json
         - name: ERC20
           file: ./abis/erc20.json
-        - name: cEther
-          file: ./abis/cEther.json
-        - name: cERC20Delegator
-          file: ./abis/cERC20Delegator.json
+        - name: GovernorBravoDelegator
+          file: ./abis/governorBravoDelegator.json
         - name: PriceOracle
           file: ./abis/priceOracle.json
       eventHandlers:

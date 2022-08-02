@@ -30,28 +30,22 @@ export function handleBorrow(event: Borrow): void {
   }
 
   const market = getMarket(marketId, event);
-  const accountMarket = getAccountMarket(borrowerAccountId, marketId, event);
+  const borrowerAccount = getAccount(borrowerAccountId, event);
+  const borrowerAccountMarket = getAccountMarket(borrowerAccount.id, marketId, event);
 
   // Update cTokenStats common for all events, and return the stats to update unique
   // values for each event
-  addTransactionToAccountMarket(accountMarket, event);
+  addTransactionToAccountMarket(borrowerAccountMarket, event);
 
-  const accountBorrows = event.params.accountBorrows
-    .toBigDecimal()
-    .div(exponentToBigDecimal(market.underlyingDecimals))
-    .truncate(market.underlyingDecimals);
-  const borrowAmount = event.params.borrowAmount
-    .toBigDecimal()
-    .div(exponentToBigDecimal(market.underlyingDecimals))
-    .truncate(market.underlyingDecimals);
-  const previousBorrow = accountMarket.storedBorrowBalance;
+  const accountBorrows = event.params.accountBorrows.toBigDecimal().div(exponentToBigDecimal(market.underlyingDecimals));
+  const borrowAmount = event.params.borrowAmount.toBigDecimal().div(exponentToBigDecimal(market.underlyingDecimals));
+  const previousBorrow = borrowerAccountMarket.storedBorrowBalance;
 
-  accountMarket.storedBorrowBalance = accountBorrows;
-  accountMarket.accountBorrowIndex = market.borrowIndex;
-  accountMarket.totalUnderlyingBorrowed = accountMarket.totalUnderlyingBorrowed.plus(borrowAmount);
-  accountMarket.save();
+  borrowerAccountMarket.storedBorrowBalance = accountBorrows;
+  borrowerAccountMarket.accountBorrowIndex = market.borrowIndex;
+  borrowerAccountMarket.totalUnderlyingBorrowed = borrowerAccountMarket.totalUnderlyingBorrowed.plus(borrowAmount);
+  borrowerAccountMarket.save();
 
-  const borrowerAccount = getAccount(borrowerAccountId, event);
   borrowerAccount.hasBorrowed = true;
   borrowerAccount.save();
 

@@ -46,13 +46,13 @@ export function handleTransfer(event: Transfer): void {
   market = updateMarket(market, event);
 
   const amountUnderlying = market.exchangeRate.times(amountToDecimal(event.params.amount, CTokenDecimals));
-  const amountUnderylingTruncated = amountUnderlying.truncate(market.underlyingDecimals);
+  const amountUnderylingTruncated = amountUnderlying;
 
   // Checking if the tx is FROM the cToken contract (i.e. this will not run when minting)
   // If so, it is a mint, and we don't need to run these calculations
   if (accountFromId != marketId) {
     const accountFrom = getAccount(accountFromId, event);
-    const accountMarketFrom = getAccountMarket(accountFromId, marketId, event);
+    const accountMarketFrom = getAccountMarket(accountFrom.id, marketId, event);
 
     // Update cTokenStats common for all events, and return the stats to update unique
     // values for each event
@@ -77,7 +77,7 @@ export function handleTransfer(event: Transfer): void {
   // be messy to include, so we are leaving it out for now TODO fix this in future
   if (accountToId != marketId) {
     const accountTo = getAccount(accountToId, event);
-    const accountMarketTo = getAccountMarket(accountToId, marketId, event);
+    const accountMarketTo = getAccountMarket(accountTo.id, marketId, event);
 
     // Update cTokenStats common for all events, and return the stats to update unique
     // values for each event

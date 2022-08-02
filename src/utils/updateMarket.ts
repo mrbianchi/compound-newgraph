@@ -25,7 +25,7 @@ function updateCommonMarket(market: Market, event: ethereum.Event): void {
   const contractAddress = Address.fromString(market.id);
   const contract = CToken.bind(contractAddress);
 
-  market.latestBlockNumber = event.block.number; //contract.accrualBlockNumber();
+  market.latestBlockNumber = event.block.number;
   market.latestBlockTimestamp = event.block.timestamp;
 
   market.exchangeRate = amountToDecimal(
@@ -37,14 +37,14 @@ function updateCommonMarket(market: Market, event: ethereum.Event): void {
   market.totalSupply = amountToDecimal(contract.totalSupply(), CTokenDecimals).times(market.exchangeRate);
   market.totalSupplyUSD = market.totalSupply.times(market.underlyingPriceUSD);
   market.supplyRatePerBlock = amountToDecimal(contract.supplyRatePerBlock(), MantissaFactor); //TODO .times(BigDecimal.fromString("2102400"))
-  market.supplyAPY = calculateAPY(market.supplyRatePerBlock);
+  market.supplyAPY = ZeroBD; //calculateAPY(market.supplyRatePerBlock);
   //market.totalSupplyAPY = market.supplyAPY.plus(compSupplyAPY); //TODO
   //market.compSpeedSupply = ZeroBI;
   //market.numberOfBorrowers = ZeroBI;
   market.totalBorrow = amountToDecimal(contract.totalBorrows(), market.underlyingDecimals);
   market.totalBorrowUSD = market.totalBorrow.times(market.underlyingPriceUSD);
   market.borrowRatePerBlock = amountToDecimal(contract.borrowRatePerBlock(), MantissaFactor); //TODO .times(BigDecimal.fromString("2102400"))
-  market.borrowAPY = calculateAPY(market.borrowRatePerBlock);
+  market.borrowAPY = ZeroBD; //calculateAPY(market.borrowRatePerBlock);
   //market.totalBorrowAPY = market.borrowAPY.minus(compBorrowAPY); //TODO
   market.borrowIndex = amountToDecimal(contract.borrowIndex(), MantissaFactor);
   //market.borrowCap = amountToDecimal(tryBorrowCaps.value, BigInt.fromU32(18));
@@ -81,7 +81,7 @@ function updateCommonMarket(market: Market, event: ethereum.Event): void {
 function updateNativeMarket(market: Market): void {
   const contractAddress = Address.fromString(market.id);
   const tokenPriceUSD = getTokenPrice(contractAddress, market.underlyingDecimals);
-  market.underlyingPriceUSD = tokenPriceUSD.truncate(market.underlyingDecimals);
+  market.underlyingPriceUSD = tokenPriceUSD;
 }
 
 function updateERC20Market(market: Market): void {
@@ -90,8 +90,11 @@ function updateERC20Market(market: Market): void {
   const tokenPriceUSD = getTokenPrice(contractAddress, market.underlyingDecimals);
   const nativeTokenPriceUSD = getTokenPrice(nativeTokenAddress, NativeTokenDecimals);
 
-  market.underlyingPriceNative = tokenPriceUSD.div(nativeTokenPriceUSD).truncate(market.underlyingDecimals);
-  market.underlyingPriceUSD = tokenPriceUSD.truncate(market.underlyingDecimals);
+  market.underlyingPriceNative = ZeroBD;
+  if (nativeTokenPriceUSD.notEqual(ZeroBD)) {
+    market.underlyingPriceNative = tokenPriceUSD.div(nativeTokenPriceUSD);
+  }
+  market.underlyingPriceUSD = tokenPriceUSD;
 }
 
 export function updateMarket(market: Market, event: ethereum.Event): Market {

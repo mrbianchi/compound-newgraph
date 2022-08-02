@@ -1,6 +1,5 @@
 import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import {
-  DefaultComptrollerId,
   MantissaFactor,
   NativeTokenDecimals,
   NativeTokenName,
@@ -18,7 +17,6 @@ import { CToken } from "../types/templates";
 import { amountToDecimal } from "./amountToDecimal";
 
 function fillCommonMarket(market: Market, event: ethereum.Event): void {
-  market.comptroller = DefaultComptrollerId;
   market.creationBlockNumber = event.block.number;
   market.creationBlockTimestamp = event.block.timestamp;
   market.latestBlockNumber = event.block.number;

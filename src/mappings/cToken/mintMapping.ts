@@ -2,7 +2,7 @@ import { log } from "@graphprotocol/graph-ts";
 import { CTokenDecimals } from "../../constants";
 import { MintEvent } from "../../types/schema";
 import { Mint } from "../../types/templates/CToken/CToken";
-import { exponentToBigDecimal, getMarket, isNonFunctionalMarket } from "../../utils";
+import { getMarket, isNonFunctionalMarket } from "../../utils";
 import { amountToDecimal } from "../../utils/amountToDecimal";
 
 /* Account supplies assets into market and receives cTokens in exchange

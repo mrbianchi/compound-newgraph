@@ -36,11 +36,17 @@ type Comptroller @entity {
 
   "All the markets that the comptroller controls"
   markets: [Market!]!
+
+  "Historical data in hourly intervals"
+  historicalHourData: [ComptrollerHourData!]! @derivedFrom(field: "comptroller")
 }
 
 type ComptrollerHourData @entity {
   "Comptroller Id concatendated with timestamp"
   id: String!
+
+  "Relation to comptroller"
+  comptroller: Comptroller!
 
   "Unix timestamp in seconds rounded to the start of the hour"
   timestamp: BigInt!
@@ -66,9 +72,6 @@ type ComptrollerHourData @entity {
 type Market @entity {
   "Market address"
   id: String!
-
-  "Relation to comptroller"
-  comptroller: String!
   
   "Block number when the market was created"
   creationBlockNumber: BigInt!
@@ -189,6 +192,9 @@ type Market @entity {
 
   "Exchange rate of underlying tokens / cTokens"
   exchangeRate:  BigDecimal!
+
+  "Historical data in hourly intervals"
+  historicalHourData: [MarketHourData!]! @derivedFrom(field: "market")
 }
 
 type MarketHourData @entity {
@@ -540,7 +546,7 @@ type Account @entity {
   totalBorrowUSD: BigDecimal!
 
   "Array of markets user is in"
-  markets: [AccountMarket!]! # @derivedFrom(field: "account")
+  markets: [AccountMarket!]! @derivedFrom(field: "account")
 }
 
 type AccountMarket @entity {
@@ -595,8 +601,8 @@ type AccountMarket @entity {
   "Current borrow balance stored in contract (exclusive of interest since latestBlockNumber)"
   storedBorrowBalance: BigDecimal!
 
-  #"Array of transactions"
-  #transactions: [AccountMarketTransaction!]! @derivedFrom(field: "accountMarket")
+  "Array of transactions"
+  transactions: [AccountMarketTransaction!]! @derivedFrom(field: "accountMarket")
 
   # The following values are added by the JS Wrapper, and must be calculated with the most up
   # to date values based on the block delta for market.exchangeRate and market.borrowIndex

@@ -55,10 +55,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   // the underwater borrower. So we must get that address from the event, and
   // the repay token is the event.address
   const cTokenAmount = amountToDecimal(event.params.seizeTokens, CTokenDecimals);
-  const underlyingRepayAmount = event.params.repayAmount
-    .toBigDecimal()
-    .div(exponentToBigDecimal(market.underlyingDecimals))
-    .truncate(market.underlyingDecimals);
+  const underlyingRepayAmount = event.params.repayAmount.toBigDecimal().div(exponentToBigDecimal(market.underlyingDecimals));
 
   const liquidationEventId = event.transaction.hash.toHexString().concat("-").concat(event.transactionLogIndex.toString());
   const liquidationEvent = new LiquidationEvent(liquidationEventId);

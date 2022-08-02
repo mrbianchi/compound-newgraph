@@ -1,6 +1,6 @@
 import { log } from "@graphprotocol/graph-ts";
 import { MarketExited } from "../../types/Comptroller/Comptroller";
-import { addTransactionToAccountMarket, getAccountMarket, isNonFunctionalMarket } from "../../utils";
+import { addTransactionToAccountMarket, getAccount, getAccountMarket, isNonFunctionalMarket } from "../../utils";
 
 export function handleMarketExited(event: MarketExited): void {
   const accountId = event.params.account.toHexString();
@@ -11,7 +11,8 @@ export function handleMarketExited(event: MarketExited): void {
     return;
   }
 
-  const accountMarket = getAccountMarket(accountId, marketId, event);
+  const account = getAccount(accountId, event);
+  const accountMarket = getAccountMarket(account.id, marketId, event);
   addTransactionToAccountMarket(accountMarket, event);
   accountMarket.enteredMarket = false;
   accountMarket.save();

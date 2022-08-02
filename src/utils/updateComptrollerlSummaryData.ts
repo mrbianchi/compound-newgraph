@@ -5,11 +5,8 @@ import { getMarket } from "./getMarket";
 
 export function updateComptrollerlSummaryData(event: ethereum.Event): void {
   const comptroller = getComptroller();
-
-  comptroller.latestBlockNumber = event.block.number;
-  comptroller.latestBlockTimestamp = event.block.timestamp;
-
   const marketsIds = comptroller.markets;
+
   let utilization = ZeroBD;
   let totalSupplyUSD = ZeroBD;
   let totalBorrowUSD = ZeroBD;
@@ -27,6 +24,8 @@ export function updateComptrollerlSummaryData(event: ethereum.Event): void {
     utilization = totalBorrowUSD.div(totalSupplyUSD);
   }
 
+  comptroller.latestBlockNumber = event.block.number;
+  comptroller.latestBlockTimestamp = event.block.timestamp;
   comptroller.totalSupplyUSD = totalSupplyUSD;
   comptroller.totalBorrowUSD = totalBorrowUSD;
   comptroller.totalReservesUSD = totalReservesUSD;
