@@ -5,6 +5,11 @@ import { getMarket } from "./getMarket";
 
 export function updateComptrollerlSummaryData(event: ethereum.Event): void {
   const comptroller = getComptroller();
+
+  if (!comptroller.markets) {
+    return;
+  }
+
   const marketsIds = comptroller.markets;
 
   let utilization = ZeroBD;

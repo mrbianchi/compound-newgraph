@@ -105,6 +105,5 @@ export function createMarket(marketId: string, event: ethereum.Event): Market {
     fillERC20Market(market);
   }
 
-  market.save();
   return market;
 }

@@ -13,6 +13,10 @@ export function handleCompBorrowSpeedUpdated(event: CompBorrowSpeedUpdated): voi
   }
 
   const market = getMarket(marketId, event);
+
+  market.latestBlockNumber = event.block.number;
+  market.latestBlockTimestamp = event.block.timestamp;
   market.compSpeedBorrow = amountToDecimal(event.params.newSpeed, MantissaFactor);
+
   market.save();
 }

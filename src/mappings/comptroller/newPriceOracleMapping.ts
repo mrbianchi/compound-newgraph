@@ -3,6 +3,9 @@ import { getComptroller } from "../../utils";
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   const comptroller = getComptroller();
+
   comptroller.priceOracleAddress = event.params.newPriceOracle;
+  comptroller.oracleSinceBlockNumber = event.block.number;
+
   comptroller.save();
 }

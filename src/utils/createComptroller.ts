@@ -15,6 +15,5 @@ export function createComptroller(): Comptroller {
   comptroller.totalReservesUSD = ZeroBD;
   comptroller.utilization = ZeroBD;
   comptroller.markets = [];
-  comptroller.save();
   return comptroller;
 }

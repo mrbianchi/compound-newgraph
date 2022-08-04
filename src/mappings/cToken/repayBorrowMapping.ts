@@ -3,12 +3,13 @@ import { ZeroBD } from "../../constants";
 import { RepayUnderlyingEvent } from "../../types/schema";
 import { RepayBorrow } from "../../types/templates/CToken/CToken";
 import {
-  addTransactionToAccountMarket,
   exponentToBigDecimal,
   getAccount,
   getAccountMarket,
   getMarket,
   isNonFunctionalMarket,
+  updateAccountAggregates,
+  updateAccountMarket,
 } from "../../utils";
 
 /* Repay some amount borrowed. Anyone can repay anyones balance
@@ -27,35 +28,34 @@ import {
  */
 export function handleRepayBorrow(event: RepayBorrow): void {
   const marketId = event.address.toHexString();
-  const accountId = event.params.borrower.toHexString();
 
   if (isNonFunctionalMarket(marketId)) {
     log.error("Non functional market {}", [marketId]);
     return;
   }
 
+  const borrowerId = event.params.borrower.toHexString();
   const market = getMarket(marketId, event);
-  const account = getAccount(accountId, event);
-  const accountMarket = getAccountMarket(account.id, marketId, event);
-
-  // Update cTokenStats common for all events, and return the stats to update unique
-  // values for each event
-  addTransactionToAccountMarket(accountMarket, event);
-
+  const borrowerAccount = getAccount(borrowerId, event);
+  const borrowerAccountMarket = getAccountMarket(borrowerId, marketId, event);
   const accountBorrows = event.params.accountBorrows.toBigDecimal().div(exponentToBigDecimal(market.underlyingDecimals));
   const repayAmount = event.params.repayAmount.toBigDecimal().div(exponentToBigDecimal(market.underlyingDecimals));
 
-  accountMarket.storedBorrowBalance = accountBorrows;
-  accountMarket.accountBorrowIndex = market.borrowIndex;
-  accountMarket.totalUnderlyingRepaid = accountMarket.totalUnderlyingRepaid.plus(repayAmount);
-  accountMarket.save();
+  updateAccountMarket(borrowerAccountMarket, market, event);
 
-  if (accountMarket.storedBorrowBalance.equals(ZeroBD)) {
+  borrowerAccountMarket.storedBorrowBalance = accountBorrows;
+  borrowerAccountMarket.accountBorrowIndex = market.borrowIndex;
+  borrowerAccountMarket.totalUnderlyingRepaid = borrowerAccountMarket.totalUnderlyingRepaid.plus(repayAmount);
+
+  if (borrowerAccountMarket.storedBorrowBalance.equals(ZeroBD)) {
     market.numberOfBorrowers = market.numberOfBorrowers.minus(BigInt.fromU64(1));
-    market.save();
   }
 
-  account.save();
+  updateAccountAggregates(borrowerAccount);
+
+  market.save();
+  borrowerAccount.save();
+  borrowerAccountMarket.save();
 
   const repayEventId = event.transaction.hash.toHexString().concat("-").concat(event.transactionLogIndex.toString());
   const repayEvent = new RepayUnderlyingEvent(repayEventId);

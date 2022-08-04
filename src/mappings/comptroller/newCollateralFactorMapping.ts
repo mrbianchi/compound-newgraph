@@ -13,6 +13,10 @@ export function handleNewCollateralFactor(event: NewCollateralFactor): void {
   }
 
   const market = getMarket(marketId, event);
+
+  market.latestBlockNumber = event.block.number;
+  market.latestBlockTimestamp = event.block.timestamp;
   market.collateralFactor = amountToDecimal(event.params.newCollateralFactorMantissa, MantissaFactor);
+
   market.save();
 }

@@ -1,12 +1,10 @@
 import { ethereum } from "@graphprotocol/graph-ts";
 import { OneBD, OneBI } from "../constants";
-import { getMarket } from "./getMarket";
+import { Market } from "../types/schema";
 import { getMarketHourData } from "./getMarketHourData";
 
-export function updateMarketHistoricalData(event: ethereum.Event): void {
-  const marketId = event.address.toHexString();
-  const market = getMarket(marketId, event);
-  const marketHourData = getMarketHourData(marketId, event.block.timestamp);
+export function updateMarketHistoricalData(market: Market, event: ethereum.Event): void {
+  const marketHourData = getMarketHourData(market.id, event.block.timestamp);
   const transactionsCount = marketHourData.transactionsCount.toBigDecimal();
   const oldValueWeight = transactionsCount.div(transactionsCount.plus(OneBD));
   const newValueWeigth = OneBD.div(transactionsCount.plus(OneBD));

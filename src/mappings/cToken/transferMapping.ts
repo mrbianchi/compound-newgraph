@@ -3,17 +3,16 @@ import { CTokenDecimals, ZeroBD } from "../../constants";
 import { TransferEvent } from "../../types/schema";
 import { Transfer } from "../../types/templates/CToken/CToken";
 import {
-  addTransactionToAccountMarket,
   getAccount,
   getAccountMarket,
   getMarket,
   isNonFunctionalMarket,
-  updateComptrollerHistoricalData,
-  updateComptrollerlSummaryData,
+  updateAccountAggregates,
+  updateAccountMarket,
   updateMarket,
-  updateMarketHistoricalData,
 } from "../../utils";
 import { amountToDecimal } from "../../utils/amountToDecimal";
+import { updateAllHistoricalData } from "../../utils/updateAllHistoricalData";
 
 /* Transferring of cTokens
  *
@@ -34,19 +33,19 @@ export function handleTransfer(event: Transfer): void {
   // We only updateMarket() if accrual block number is not up to date. This will only happen
   // with normal transfers, since mint, redeem, and seize transfers will already run updateMarket()
   const marketId = event.address.toHexString();
-  const accountFromId = event.params.from.toHexString();
-  const accountToId = event.params.to.toHexString();
 
   if (isNonFunctionalMarket(marketId)) {
     log.error("Non functional market {}", [marketId]);
     return;
   }
 
-  let market = getMarket(marketId, event);
-  market = updateMarket(market, event);
+  const accountFromId = event.params.from.toHexString();
+  const accountToId = event.params.to.toHexString();
+  const market = getMarket(marketId, event);
+
+  updateMarket(market, event);
 
   const amountUnderlying = market.exchangeRate.times(amountToDecimal(event.params.amount, CTokenDecimals));
-  const amountUnderylingTruncated = amountUnderlying;
 
   // Checking if the tx is FROM the cToken contract (i.e. this will not run when minting)
   // If so, it is a mint, and we don't need to run these calculations
@@ -54,21 +53,17 @@ export function handleTransfer(event: Transfer): void {
     const accountFrom = getAccount(accountFromId, event);
     const accountMarketFrom = getAccountMarket(accountFrom.id, marketId, event);
 
-    // Update cTokenStats common for all events, and return the stats to update unique
-    // values for each event
-    addTransactionToAccountMarket(accountMarketFrom, event);
-
-    accountMarketFrom.balance = accountMarketFrom.balance.minus(amountToDecimal(event.params.amount, CTokenDecimals));
-
-    accountMarketFrom.totalUnderlyingRedeemed = accountMarketFrom.totalUnderlyingRedeemed.plus(amountUnderylingTruncated);
-    accountMarketFrom.save();
+    updateAccountMarket(accountMarketFrom, market, event);
+    accountMarketFrom.totalUnderlyingRedeemed = accountMarketFrom.totalUnderlyingRedeemed.plus(amountUnderlying);
 
     if (accountMarketFrom.balance.equals(ZeroBD)) {
       market.numberOfSuppliers = market.numberOfSuppliers.minus(BigInt.fromU64(1));
-      market.save();
     }
 
+    updateAccountAggregates(accountFrom);
+
     accountFrom.save();
+    accountMarketFrom.save();
   }
 
   // Checking if the tx is TO the cToken contract (i.e. this will not run when redeeming)
@@ -78,25 +73,24 @@ export function handleTransfer(event: Transfer): void {
   if (accountToId != marketId) {
     const accountTo = getAccount(accountToId, event);
     const accountMarketTo = getAccountMarket(accountTo.id, marketId, event);
-
-    // Update cTokenStats common for all events, and return the stats to update unique
-    // values for each event
-    addTransactionToAccountMarket(accountMarketTo, event);
-
     const previousCTokenBalanceTo = accountMarketTo.balance;
-    accountMarketTo.balance = accountMarketTo.balance.plus(amountToDecimal(event.params.amount, CTokenDecimals));
 
-    accountMarketTo.totalUnderlyingSupplied = accountMarketTo.totalUnderlyingSupplied.plus(amountUnderylingTruncated);
-    accountMarketTo.save();
+    updateAccountMarket(accountMarketTo, market, event);
 
     // checking edge case for transfers of 0
     if (previousCTokenBalanceTo.equals(ZeroBD) && !event.params.amount.toBigDecimal().equals(ZeroBD)) {
       market.numberOfSuppliers = market.numberOfSuppliers.plus(BigInt.fromU64(1));
-      market.save();
     }
 
+    updateAccountAggregates(accountTo);
+
     accountTo.save();
+    accountMarketTo.save();
   }
+
+  updateAllHistoricalData(market, event);
+
+  market.save();
 
   const transferEventId = event.transaction.hash.toHexString().concat("-").concat(event.transactionLogIndex.toString());
   const transferEvent = new TransferEvent(transferEventId);
@@ -107,8 +101,4 @@ export function handleTransfer(event: Transfer): void {
   transferEvent.to = event.params.to;
   transferEvent.amount = amountToDecimal(event.params.amount, CTokenDecimals);
   transferEvent.save();
-
-  updateComptrollerlSummaryData(event);
-  updateMarketHistoricalData(event);
-  updateComptrollerHistoricalData(event);
 }

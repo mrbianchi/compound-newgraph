@@ -1,25 +1,9 @@
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { CTokenDecimals, MantissaFactor, NativeTokenDecimals, OneBD, ZeroBD, ZeroBI, cNativeAddress } from "../constants";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { BlocksPerYear, CTokenDecimals, MantissaFactor, NativeTokenDecimals, ZeroBD, cNativeAddress } from "../constants";
 import { Market } from "../types/schema";
 import { CToken } from "../types/templates/CToken/CToken";
 import { amountToDecimal } from "./amountToDecimal";
 import { getTokenPrice } from "./getTokenPrice";
-
-export const SEC_PER_BLOCK = BigDecimal.fromString("13.5");
-export const SEC_PER_DAY = BigInt.fromU32(86400);
-export const BLOCK_PER_SEC = BigDecimal.fromString("1").div(SEC_PER_BLOCK);
-export const BLOCKS_PER_DAY = BLOCK_PER_SEC.times(SEC_PER_DAY.toBigDecimal());
-export const DAYS_PER_YEAR = BigInt.fromU32(365);
-
-export function calculateAPY(ratePerBlock: BigDecimal): BigDecimal {
-  const base = ratePerBlock.times(BLOCKS_PER_DAY).plus(OneBD);
-
-  let apy = BigDecimal.fromString("1");
-  for (let i = ZeroBI; i.lt(DAYS_PER_YEAR); i = i.plus(ZeroBI)) {
-    apy = apy.times(base);
-  }
-  return apy.minus(OneBD);
-}
 
 function updateCommonMarket(market: Market, event: ethereum.Event): void {
   const contractAddress = Address.fromString(market.id);
@@ -37,14 +21,14 @@ function updateCommonMarket(market: Market, event: ethereum.Event): void {
   market.totalSupply = amountToDecimal(contract.totalSupply(), CTokenDecimals).times(market.exchangeRate);
   market.totalSupplyUSD = market.totalSupply.times(market.underlyingPriceUSD);
   market.supplyRatePerBlock = amountToDecimal(contract.supplyRatePerBlock(), MantissaFactor); //TODO .times(BigDecimal.fromString("2102400"))
-  market.supplyAPY = ZeroBD; //calculateAPY(market.supplyRatePerBlock);
+  market.supplyAPY = market.supplyRatePerBlock.times(BlocksPerYear);
   //market.totalSupplyAPY = market.supplyAPY.plus(compSupplyAPY); //TODO
   //market.compSpeedSupply = ZeroBI;
   //market.numberOfBorrowers = ZeroBI;
   market.totalBorrow = amountToDecimal(contract.totalBorrows(), market.underlyingDecimals);
   market.totalBorrowUSD = market.totalBorrow.times(market.underlyingPriceUSD);
   market.borrowRatePerBlock = amountToDecimal(contract.borrowRatePerBlock(), MantissaFactor); //TODO .times(BigDecimal.fromString("2102400"))
-  market.borrowAPY = ZeroBD; //calculateAPY(market.borrowRatePerBlock);
+  market.borrowAPY = market.borrowRatePerBlock.times(BlocksPerYear);
   //market.totalBorrowAPY = market.borrowAPY.minus(compBorrowAPY); //TODO
   market.borrowIndex = amountToDecimal(contract.borrowIndex(), MantissaFactor);
   //market.borrowCap = amountToDecimal(tryBorrowCaps.value, BigInt.fromU32(18));
@@ -97,10 +81,10 @@ function updateERC20Market(market: Market): void {
   market.underlyingPriceUSD = tokenPriceUSD;
 }
 
-export function updateMarket(market: Market, event: ethereum.Event): Market {
+export function updateMarket(market: Market, event: ethereum.Event): void {
   // Only updateMarket if it has not been updated this block
   if (market.latestBlockNumber == event.block.number) {
-    return market;
+    return;
   }
 
   if (market.id == cNativeAddress) {
@@ -111,8 +95,4 @@ export function updateMarket(market: Market, event: ethereum.Event): Market {
   }
 
   updateCommonMarket(market, event);
-
-  market.save();
-
-  return market;
 }

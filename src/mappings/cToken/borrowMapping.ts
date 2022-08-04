@@ -1,14 +1,15 @@
-import { BigInt, log } from "@graphprotocol/graph-ts";
-import { ZeroBD } from "../../constants";
+import { log } from "@graphprotocol/graph-ts";
+import { OneBI, ZeroBD } from "../../constants";
 import { BorrowUnderlyingEvent } from "../../types/schema";
 import { Borrow } from "../../types/templates/CToken/CToken";
 import {
-  addTransactionToAccountMarket,
   exponentToBigDecimal,
   getAccount,
   getAccountMarket,
   getMarket,
   isNonFunctionalMarket,
+  updateAccountAggregates,
+  updateAccountMarket,
 } from "../../utils";
 
 /* Borrow assets from the protocol. All values either native token or ERC20
@@ -22,44 +23,43 @@ import {
  */
 export function handleBorrow(event: Borrow): void {
   const marketId = event.address.toHexString();
-  const borrowerAccountId = event.params.borrower.toHexString();
 
   if (isNonFunctionalMarket(marketId)) {
     log.error("Non functional market {}", [marketId]);
     return;
   }
 
+  const borrowerAccountId = event.params.borrower.toHexString();
+  const accountBorrowsBD = event.params.accountBorrows.toBigDecimal();
+  const borrowAmountBD = event.params.borrowAmount.toBigDecimal();
   const market = getMarket(marketId, event);
   const borrowerAccount = getAccount(borrowerAccountId, event);
-  const borrowerAccountMarket = getAccountMarket(borrowerAccount.id, marketId, event);
+  const borrowerAccountMarket = getAccountMarket(borrowerAccountId, marketId, event);
+  const previousStoredBorrowBalance = borrowerAccountMarket.storedBorrowBalance;
 
-  // Update cTokenStats common for all events, and return the stats to update unique
-  // values for each event
-  addTransactionToAccountMarket(borrowerAccountMarket, event);
-
-  const accountBorrows = event.params.accountBorrows.toBigDecimal().div(exponentToBigDecimal(market.underlyingDecimals));
-  const borrowAmount = event.params.borrowAmount.toBigDecimal().div(exponentToBigDecimal(market.underlyingDecimals));
-  const previousBorrow = borrowerAccountMarket.storedBorrowBalance;
-
-  borrowerAccountMarket.storedBorrowBalance = accountBorrows;
-  borrowerAccountMarket.accountBorrowIndex = market.borrowIndex;
-  borrowerAccountMarket.totalUnderlyingBorrowed = borrowerAccountMarket.totalUnderlyingBorrowed.plus(borrowAmount);
-  borrowerAccountMarket.save();
+  updateAccountMarket(borrowerAccountMarket, market, event);
 
   borrowerAccount.hasBorrowed = true;
-  borrowerAccount.save();
+
+  borrowerAccountMarket.storedBorrowBalance = accountBorrowsBD.div(exponentToBigDecimal(market.underlyingDecimals));
+  borrowerAccountMarket.accountBorrowIndex = market.borrowIndex;
 
   // checking edge case for borrwing 0
-  if (previousBorrow.equals(ZeroBD) && !event.params.accountBorrows.toBigDecimal().equals(ZeroBD)) {
-    market.numberOfBorrowers = market.numberOfBorrowers.plus(BigInt.fromU64(1));
-    market.save();
+  if (previousStoredBorrowBalance.equals(ZeroBD) && !accountBorrowsBD.equals(ZeroBD)) {
+    market.numberOfBorrowers = market.numberOfBorrowers.plus(OneBI);
   }
+
+  updateAccountAggregates(borrowerAccount);
+
+  market.save();
+  borrowerAccount.save();
+  borrowerAccountMarket.save();
 
   const borrowEventId = event.transaction.hash.toHexString().concat("-").concat(event.transactionLogIndex.toString());
   const borrowEvent = new BorrowUnderlyingEvent(borrowEventId);
   borrowEvent.market = marketId;
-  borrowEvent.amount = borrowAmount;
-  borrowEvent.accountBorrows = accountBorrows;
+  borrowEvent.amount = borrowAmountBD.div(exponentToBigDecimal(market.underlyingDecimals));
+  borrowEvent.accountBorrows = borrowerAccountMarket.storedBorrowBalance;
   borrowEvent.borrower = event.params.borrower;
   borrowEvent.blockNumber = event.block.number;
   borrowEvent.blockTimestamp = event.block.timestamp;

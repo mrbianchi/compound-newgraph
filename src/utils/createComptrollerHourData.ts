@@ -14,6 +14,5 @@ export function createComptrollerHourData(blockTimestamp: BigInt): ComptrollerHo
   comptrollerHourData.totalBorrowUSD = ZeroBD;
   comptrollerHourData.totalReservesUSD = ZeroBD;
   comptrollerHourData.utilization = ZeroBD;
-  comptrollerHourData.save();
   return comptrollerHourData;
 }

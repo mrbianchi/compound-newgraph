@@ -13,6 +13,10 @@ export function handleNewBorrowCap(event: NewBorrowCap): void {
   }
 
   const market = getMarket(marketId, event);
+
+  market.latestBlockNumber = event.block.number;
+  market.latestBlockTimestamp = event.block.timestamp;
   market.borrowCap = amountToDecimal(event.params.newBorrowCap, MantissaFactor);
+
   market.save();
 }

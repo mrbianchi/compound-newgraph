@@ -1,6 +1,6 @@
 import { log } from "@graphprotocol/graph-ts";
 import { MarketListed } from "../../types/Comptroller/Comptroller";
-import { createMarket, isNonFunctionalMarket } from "../../utils";
+import { getMarket, isNonFunctionalMarket } from "../../utils";
 
 export function handleMarketListed(event: MarketListed): void {
   const marketId = event.params.cToken.toHexString();
@@ -10,6 +10,7 @@ export function handleMarketListed(event: MarketListed): void {
     return;
   }
 
-  const market = createMarket(marketId, event);
+  const market = getMarket(marketId, event);
+
   market.save();
 }

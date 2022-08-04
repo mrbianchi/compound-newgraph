@@ -37,6 +37,5 @@ export function createMarketHourData(marketId: string, blockTimestamp: BigInt): 
   marketHourData.availableLiquidityUSD = ZeroBD;
   marketHourData.utilization = ZeroBD;
   marketHourData.exchangeRate = ZeroBD;
-  marketHourData.save();
   return marketHourData;
 }

@@ -13,6 +13,9 @@ export function handleMarketActionPaused(event: ActionPaused1): void {
 
   const market = getMarket(marketId, event);
 
+  market.latestBlockNumber = event.block.number;
+  market.latestBlockTimestamp = event.block.timestamp;
+
   if (event.params.action == MarketActionTypes.Mint) {
     market.mintsPaused = event.params.pauseState;
   } else if (event.params.action == MarketActionTypes.Borrow) {

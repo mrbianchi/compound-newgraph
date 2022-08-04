@@ -12,9 +12,8 @@ export function createAccount(accountId: string, event: ethereum.Event): Account
   account.countLiquidator = ZeroBI;
   account.hasBorrowed = false;
   account.health = ZeroBD;
-  account.totalSupplyUSD = ZeroBD;
-  account.totalBorrowUSD = ZeroBD;
+  account.totalUnderlyingSuppliedUSD = ZeroBD;
+  account.totalUnderlyingBorrowedUSD = ZeroBD;
   //account.markets = [];
-  account.save();
   return account;
 }

@@ -3,6 +3,9 @@ type Comptroller @entity {
   
   "Address of price oracle the comptroller uses"
   priceOracleAddress: Bytes!
+
+  "Block number when the price oracle was last updated"
+  oracleSinceBlockNumber: BigInt!
   
   "Current factor used to determine repayAmount for liquidating"
   closeFactor: BigDecimal!
@@ -38,7 +41,7 @@ type Comptroller @entity {
   markets: [Market!]!
 
   "Historical data in hourly intervals"
-  historicalHourData: [ComptrollerHourData!]! @derivedFrom(field: "comptroller")
+  historicalHourData: [ComptrollerHourData!] @derivedFrom(field: "comptroller")
 }
 
 type ComptrollerHourData @entity {
@@ -194,7 +197,7 @@ type Market @entity {
   exchangeRate:  BigDecimal!
 
   "Historical data in hourly intervals"
-  historicalHourData: [MarketHourData!]! @derivedFrom(field: "market")
+  historicalHourData: [MarketHourData!] @derivedFrom(field: "market")
 }
 
 type MarketHourData @entity {
@@ -540,13 +543,13 @@ type Account @entity {
   health: BigDecimal!
   
   "aggregate total of all supplied tokens by the user in all markets in USD"
-  totalSupplyUSD: BigDecimal!
+  totalUnderlyingSuppliedUSD: BigDecimal!
   
   "aggregate total of all borrowed tokens by the user in all markets in USD"
-  totalBorrowUSD: BigDecimal!
+  totalUnderlyingBorrowedUSD: BigDecimal!
 
   "Array of markets user is in"
-  markets: [AccountMarket!]! @derivedFrom(field: "account")
+  markets: [AccountMarket!] @derivedFrom(field: "account")
 }
 
 type AccountMarket @entity {
@@ -601,9 +604,6 @@ type AccountMarket @entity {
   "Current borrow balance stored in contract (exclusive of interest since latestBlockNumber)"
   storedBorrowBalance: BigDecimal!
 
-  "Array of transactions"
-  transactions: [AccountMarketTransaction!]! @derivedFrom(field: "accountMarket")
-
   # The following values are added by the JS Wrapper, and must be calculated with the most up
   # to date values based on the block delta for market.exchangeRate and market.borrowIndex
   # They do not need to be in the schema, but they will show up in the explorer playground
@@ -616,24 +616,6 @@ type AccountMarket @entity {
   # FORMULA: borrowBalanceUnderlying = storedBorrowBalance * market.borrowIndex / accountBorrowIndex
   # lifetimeBorrowInterestAccrued: BigDecimal!
   # FORMULA: lifetimeBorrowInterestAccrued = borrowBalanceUnderlying - totalUnderlyingBorrowed + totalUnderlyingRepaid
-}
-
-type AccountMarketTransaction @entity(immutable: true) {
-  "Concatenation of account market, transaction hash and log index"
-  id: String!
-  
-  "Relation to account market"
-  accountMarket: AccountMarket!
-  
-  "Block number of transaction"
-  blockNumber: BigInt!
-  
-  "Block timestamp of transaction"
-  blockTimestamp: BigInt!
-  
-  transactionHash: Bytes!
-  
-  transactionLogIndex: BigInt!
 }
 
 ### Proposals ###

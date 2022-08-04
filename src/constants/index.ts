@@ -19,3 +19,7 @@ export const OneBD = BigDecimal.fromString("1");
 export const SecondsPerHour = BigInt.fromU32(3600);
 export const SecondsPerDay = BigInt.fromU32(86400);
 export const SecondsPerWeek = BigInt.fromU32(604800);
+export const SecondsPerYear = SecondsPerDay.times(BigInt.fromI32(365));
+export const SecondsPerBlock = BigDecimal.fromString("13.5");
+export const BlocksPerSec = OneBD.div(SecondsPerBlock);
+export const BlocksPerYear = BlocksPerSec.times(SecondsPerYear.toBigDecimal());
