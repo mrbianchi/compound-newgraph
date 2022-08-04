@@ -1,9 +1,32 @@
-import { Address, ethereum } from "@graphprotocol/graph-ts";
-import { BlocksPerYear, CTokenDecimals, MantissaFactor, NativeTokenDecimals, ZeroBD, cNativeAddress } from "../constants";
+import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
+import {
+  BlocksPerDay,
+  BlocksPerYear,
+  CTokenDecimals,
+  CompAddress,
+  CompDecimals,
+  MantissaFactor,
+  NativeTokenDecimals,
+  OneBD,
+  ZeroBD,
+  cNativeAddress,
+} from "../constants";
 import { Market } from "../types/schema";
 import { CToken } from "../types/templates/CToken/CToken";
 import { amountToDecimal } from "./amountToDecimal";
 import { getTokenPrice } from "./getTokenPrice";
+
+export function calculateCompDistrubtionApy(
+  totalSupplyOrBorrow: BigDecimal,
+  compSpeed: BigDecimal,
+  usdcPerUnderlying: BigDecimal
+): BigDecimal {
+  const compPrice = getTokenPrice(Address.fromString(CompAddress), CompDecimals);
+  const compDistributionPerDay = compSpeed.times(BlocksPerDay);
+  const denom = totalSupplyOrBorrow.times(usdcPerUnderlying);
+  const base = denom.notEqual(ZeroBD) ? OneBD.plus(compPrice.times(compDistributionPerDay).div(denom)) : ZeroBD;
+  return base.times(BlocksPerYear);
+}
 
 function updateCommonMarket(market: Market, event: ethereum.Event): void {
   const contractAddress = Address.fromString(market.id);
@@ -20,19 +43,21 @@ function updateCommonMarket(market: Market, event: ethereum.Event): void {
   //market.numberOfSuppliers = ZeroBI;
   market.totalSupply = amountToDecimal(contract.totalSupply(), CTokenDecimals).times(market.exchangeRate);
   market.totalSupplyUSD = market.totalSupply.times(market.underlyingPriceUSD);
-  market.supplyRatePerBlock = amountToDecimal(contract.supplyRatePerBlock(), MantissaFactor); //TODO .times(BigDecimal.fromString("2102400"))
+  market.supplyRatePerBlock = amountToDecimal(contract.supplyRatePerBlock(), MantissaFactor);
   market.supplyAPY = market.supplyRatePerBlock.times(BlocksPerYear);
-  //market.totalSupplyAPY = market.supplyAPY.plus(compSupplyAPY); //TODO
-  //market.compSpeedSupply = ZeroBI;
+  //market.compSpeedSupply = amountToDecimal(tryCompSpeedSupply.value, MantissaFactor); // CompSupplySpeedUpdated evet
+  const compSupplyAPY = calculateCompDistrubtionApy(market.totalSupply, market.compSpeedSupply, market.underlyingPriceUSD);
+  market.totalSupplyAPY = market.supplyAPY.plus(compSupplyAPY);
   //market.numberOfBorrowers = ZeroBI;
   market.totalBorrow = amountToDecimal(contract.totalBorrows(), market.underlyingDecimals);
   market.totalBorrowUSD = market.totalBorrow.times(market.underlyingPriceUSD);
-  market.borrowRatePerBlock = amountToDecimal(contract.borrowRatePerBlock(), MantissaFactor); //TODO .times(BigDecimal.fromString("2102400"))
+  market.borrowRatePerBlock = amountToDecimal(contract.borrowRatePerBlock(), MantissaFactor);
   market.borrowAPY = market.borrowRatePerBlock.times(BlocksPerYear);
-  //market.totalBorrowAPY = market.borrowAPY.minus(compBorrowAPY); //TODO
   market.borrowIndex = amountToDecimal(contract.borrowIndex(), MantissaFactor);
   //market.borrowCap = amountToDecimal(tryBorrowCaps.value, BigInt.fromU32(18));
-  //market.compSpeedBorrow = amountToDecimal(tryCompSpeeds.value, BigInt.fromU32(18));
+  //market.compSpeedBorrow = amountToDecimal(tryCompSpeedBorrow.value, MantissaFactor); // CompBorrowSpeedUpdated event
+  const compBorrowAPY = calculateCompDistrubtionApy(market.totalBorrow, market.compSpeedBorrow, market.underlyingPriceUSD);
+  market.totalBorrowAPY = market.borrowAPY.minus(compBorrowAPY);
   market.reserveFactor = amountToDecimal(contract.reserveFactorMantissa(), MantissaFactor);
   market.totalReserves = amountToDecimal(contract.totalReserves(), market.underlyingDecimals);
   market.totalReservesUSD = market.totalReserves.times(market.underlyingPriceUSD);
