@@ -10,7 +10,7 @@ export function createMarketHourData(marketId: string, blockTimestamp: BigInt): 
   marketHourData.market = marketId;
   marketHourData.timestamp = getHourStartTimestamp(blockTimestamp);
   marketHourData.transactionsCount = ZeroBI;
-  marketHourData.collateralFactor = ZeroBD;
+  marketHourData.collateralFactorPercent = ZeroBD;
   marketHourData.underlyingPriceNative = ZeroBD;
   marketHourData.underlyingPriceUSD = ZeroBD;
   marketHourData.numberOfSuppliers = ZeroBD;
@@ -19,7 +19,7 @@ export function createMarketHourData(marketId: string, blockTimestamp: BigInt): 
   marketHourData.supplyAPY = ZeroBD;
   marketHourData.supplyRatePerBlock = ZeroBD;
   marketHourData.totalSupplyAPY = ZeroBD;
-  marketHourData.compSpeedSupply = ZeroBD;
+  marketHourData.compSpeedSupplyPerBlock = ZeroBD;
   marketHourData.numberOfBorrowers = ZeroBD;
   marketHourData.totalBorrow = ZeroBD;
   marketHourData.totalBorrowUSD = ZeroBD;
@@ -28,8 +28,8 @@ export function createMarketHourData(marketId: string, blockTimestamp: BigInt): 
   marketHourData.totalBorrowAPY = ZeroBD;
   marketHourData.borrowIndex = ZeroBD;
   marketHourData.borrowCap = ZeroBD;
-  marketHourData.compSpeedBorrow = ZeroBD;
-  marketHourData.reserveFactor = ZeroBD;
+  marketHourData.compSpeedBorrowPerBlock = ZeroBD;
+  marketHourData.reserveFactorPercent = ZeroBD;
   marketHourData.totalReserves = ZeroBD;
   marketHourData.totalReservesUSD = ZeroBD;
   marketHourData.cash = ZeroBD;

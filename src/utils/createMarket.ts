@@ -5,6 +5,7 @@ import {
   NativeTokenName,
   NativeTokenSymbol,
   NullAddress,
+  OneHundredBD,
   ZeroBD,
   ZeroBI,
   cNativeAddress,
@@ -26,7 +27,7 @@ function fillCommonMarket(market: Market, event: ethereum.Event): void {
   market.interestRateModelAddress = NullAddress;
   //market.symbol = "";
   //market.name = "";
-  market.collateralFactor = ZeroBD;
+  market.collateralFactorPercent = ZeroBD;
   //market.underlyingSymbol = "";
   //market.underlyingName = "";
   market.underlyingAddress = NullAddress;
@@ -39,7 +40,7 @@ function fillCommonMarket(market: Market, event: ethereum.Event): void {
   market.supplyAPY = ZeroBD;
   market.supplyRatePerBlock = ZeroBD;
   market.totalSupplyAPY = ZeroBD;
-  market.compSpeedSupply = ZeroBD;
+  market.compSpeedSupplyPerBlock = ZeroBD;
   market.numberOfBorrowers = ZeroBI;
   market.totalBorrow = ZeroBD;
   market.totalBorrowUSD = ZeroBD;
@@ -48,8 +49,8 @@ function fillCommonMarket(market: Market, event: ethereum.Event): void {
   market.totalBorrowAPY = ZeroBD;
   market.borrowIndex = ZeroBD;
   market.borrowCap = ZeroBD;
-  market.compSpeedBorrow = ZeroBD;
-  market.reserveFactor = ZeroBD;
+  market.compSpeedBorrowPerBlock = ZeroBD;
+  market.reserveFactorPercent = ZeroBD;
   market.totalReserves = ZeroBD;
   market.totalReservesUSD = ZeroBD;
   market.cash = ZeroBD;
@@ -68,7 +69,7 @@ function fillNativeMarket(market: Market): void {
   market.underlyingSymbol = NativeTokenSymbol;
 
   market.interestRateModelAddress = contract.interestRateModel();
-  market.reserveFactor = amountToDecimal(contract.reserveFactorMantissa(), MantissaFactor);
+  market.reserveFactorPercent = amountToDecimal(contract.reserveFactorMantissa(), MantissaFactor).times(OneHundredBD);
   market.underlyingDecimals = NativeTokenDecimals;
   market.underlyingPriceNative = BigDecimal.fromString("1");
 }
@@ -85,7 +86,7 @@ function fillERC20Market(market: Market): void {
 
   market.underlyingAddress = contract.underlying();
   market.interestRateModelAddress = contract.interestRateModel();
-  market.reserveFactor = amountToDecimal(contract.reserveFactorMantissa(), MantissaFactor);
+  market.reserveFactorPercent = amountToDecimal(contract.reserveFactorMantissa(), MantissaFactor).times(OneHundredBD);
   market.underlyingDecimals = underlyingContract.decimals();
 }
 

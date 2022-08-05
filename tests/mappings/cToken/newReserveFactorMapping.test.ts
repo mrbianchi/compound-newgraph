@@ -28,7 +28,7 @@ describe("cToken ::: handleNewReserveFactor tests", () => {
   test("It should log an error if the market doesn't exist", () => {
     const tokenAddress = Address.fromString("0xa16081f360e3847006db660bae1c6d1b2e17ec2a");
     const underlyingTokenAddress = Address.fromString("0xfafafa0000000000000000000000000000000010");
-    const event = createEvent(0, 1);
+    const event = createEvent(0, 10000000000000000);
     createMockedFunction(tokenAddress, "underlying", "underlying():(address)").returns([
       ethereum.Value.fromAddress(underlyingTokenAddress),
     ]);
@@ -38,7 +38,7 @@ describe("cToken ::: handleNewReserveFactor tests", () => {
       ethereum.Value.fromAddress(Address.fromString("0xfafafa0000000000000000000000000000000011")),
     ]);
     createMockedFunction(tokenAddress, "reserveFactorMantissa", "reserveFactorMantissa():(uint256)").returns([
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(200000000000000000)),
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(20000000000000000)),
     ]);
 
     createMockedFunction(underlyingTokenAddress, "name", "name():(string)").returns([ethereum.Value.fromString("non-Native")]);
@@ -50,6 +50,6 @@ describe("cToken ::: handleNewReserveFactor tests", () => {
     handleNewReserveFactor(event);
 
     assert.entityCount("Market", 1);
-    assert.fieldEquals("Market", "0xa16081f360e3847006db660bae1c6d1b2e17ec2a", "reserveFactor", "1");
+    assert.fieldEquals("Market", "0xa16081f360e3847006db660bae1c6d1b2e17ec2a", "reserveFactorPercent", "1");
   });
 });

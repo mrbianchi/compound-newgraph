@@ -11,9 +11,9 @@ export function updateMarketHistoricalData(market: Market, event: ethereum.Event
 
   marketHourData.transactionsCount = marketHourData.transactionsCount.plus(OneBI);
 
-  marketHourData.collateralFactor = marketHourData.collateralFactor
+  marketHourData.collateralFactorPercent = marketHourData.collateralFactorPercent
     .times(oldValueWeight)
-    .plus(market.collateralFactor.times(newValueWeigth));
+    .plus(market.collateralFactorPercent.times(newValueWeigth));
 
   marketHourData.underlyingPriceNative = marketHourData.underlyingPriceNative
     .times(oldValueWeight)
@@ -43,9 +43,9 @@ export function updateMarketHistoricalData(market: Market, event: ethereum.Event
     .times(oldValueWeight)
     .plus(market.totalSupplyAPY.times(newValueWeigth));
 
-  marketHourData.compSpeedSupply = marketHourData.compSpeedSupply
+  marketHourData.compSpeedSupplyPerBlock = marketHourData.compSpeedSupplyPerBlock
     .times(oldValueWeight)
-    .plus(market.compSpeedSupply.times(newValueWeigth));
+    .plus(market.compSpeedSupplyPerBlock.times(newValueWeigth));
 
   marketHourData.numberOfBorrowers = marketHourData.numberOfBorrowers
     .times(oldValueWeight)
@@ -71,13 +71,13 @@ export function updateMarketHistoricalData(market: Market, event: ethereum.Event
 
   marketHourData.borrowCap = marketHourData.borrowCap.times(oldValueWeight).plus(market.borrowCap.times(newValueWeigth));
 
-  marketHourData.compSpeedBorrow = marketHourData.compSpeedBorrow
+  marketHourData.compSpeedBorrowPerBlock = marketHourData.compSpeedBorrowPerBlock
     .times(oldValueWeight)
-    .plus(market.compSpeedBorrow.times(newValueWeigth));
+    .plus(market.compSpeedBorrowPerBlock.times(newValueWeigth));
 
-  marketHourData.reserveFactor = marketHourData.reserveFactor
+  marketHourData.reserveFactorPercent = marketHourData.reserveFactorPercent
     .times(oldValueWeight)
-    .plus(market.reserveFactor.times(newValueWeigth));
+    .plus(market.reserveFactorPercent.times(newValueWeigth));
 
   marketHourData.totalReserves = marketHourData.totalReserves
     .times(oldValueWeight)

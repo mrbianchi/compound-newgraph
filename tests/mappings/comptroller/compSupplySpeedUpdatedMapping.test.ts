@@ -1,4 +1,4 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { assert, beforeEach, clearStore, describe, newMockEvent, test } from "matchstick-as";
 import { handleCompSupplySpeedUpdated } from "../../../src/mappings/comptroller/compSupplySpeedUpdatedMapping";
 import { CompSupplySpeedUpdated } from "../../../src/types/Comptroller/Comptroller";
@@ -10,7 +10,10 @@ function createEvent(): CompSupplySpeedUpdated {
     new ethereum.EventParam("cToken", ethereum.Value.fromAddress(Address.fromString(MarketDefaultValues.Id)))
   );
   event.parameters.push(
-    new ethereum.EventParam("newSpeed", ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(MarketDefaultValues.CompSpeedSupply)))
+    new ethereum.EventParam(
+      "newSpeed",
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromString(MarketDefaultValues.CompSpeedSupplyPerBlock.toString()))
+    )
   );
   return event;
 }
@@ -21,12 +24,12 @@ describe("Comptroller ::: handleCompSupplySpeedUpdated tests", () => {
   });
 
   test("It should update an existing Market", () => {
-    const market = new MarketBuilder().withCompSpeedSupply(1234).build();
+    const market = new MarketBuilder().withCompSpeedSupplyPerBlock(BigDecimal.fromString("1234")).build();
     const event = createEvent();
 
     handleCompSupplySpeedUpdated(event);
 
     assert.entityCount("Market", 1);
-    assert.fieldEquals("Market", market.id, "compSpeedSupply", "0");
+    assert.fieldEquals("Market", market.id, "compSpeedSupplyPerBlock", "0");
   });
 });

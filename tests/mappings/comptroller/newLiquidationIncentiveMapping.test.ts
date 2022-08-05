@@ -12,7 +12,7 @@ function createEvent(): NewLiquidationIncentive {
   event.parameters.push(
     new ethereum.EventParam(
       "newLiquidationIncentive",
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(ComptrollerDefaultValues.LiquidationIncentive))
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromString(ComptrollerDefaultValues.LiquidationIncentive.toString()))
     )
   );
   return event;

@@ -16,7 +16,7 @@ export function handleCompBorrowSpeedUpdated(event: CompBorrowSpeedUpdated): voi
 
   market.latestBlockNumber = event.block.number;
   market.latestBlockTimestamp = event.block.timestamp;
-  market.compSpeedBorrow = amountToDecimal(event.params.newSpeed, MantissaFactor);
+  market.compSpeedBorrowPerBlock = amountToDecimal(event.params.newSpeed, MantissaFactor);
 
   market.save();
 }

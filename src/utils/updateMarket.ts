@@ -1,14 +1,17 @@
 import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import {
   BlocksPerDay,
-  BlocksPerYear,
   CTokenDecimals,
   CompAddress,
   CompDecimals,
+  DayPerYear,
   MantissaFactor,
   NativeTokenDecimals,
   OneBD,
+  OneBI,
+  OneHundredBD,
   ZeroBD,
+  ZeroBI,
   cNativeAddress,
 } from "../constants";
 import { Market } from "../types/schema";
@@ -16,16 +19,57 @@ import { CToken } from "../types/templates/CToken/CToken";
 import { amountToDecimal } from "./amountToDecimal";
 import { getTokenPrice } from "./getTokenPrice";
 
-export function calculateCompDistrubtionApy(
-  totalSupplyOrBorrow: BigDecimal,
-  compSpeed: BigDecimal,
-  usdcPerUnderlying: BigDecimal
+// From 'Calculating the APY Using Rate Per Block' (https://compound.finance/docs#protocol-math)
+function calculateAPY(ratePerBlock: BigDecimal): BigDecimal {
+  const base = OneBD.plus(ratePerBlock.times(BlocksPerDay));
+  let result = OneBD;
+
+  for (let i = ZeroBI; i.lt(DayPerYear); i = i.plus(OneBI)) {
+    result = result.times(base);
+  }
+
+  return result.minus(OneBD).times(OneHundredBD);
+}
+
+// From https://gist.github.com/ajb413/d32442edae9251ad395436d5b80d4480
+function calculateCompSupplyDistrubtionAPY(
+  totalSupplyUSD: BigDecimal,
+  exchangeRate: BigDecimal,
+  compSpeedSupplyPerBlock: BigDecimal
 ): BigDecimal {
-  const compPrice = getTokenPrice(Address.fromString(CompAddress), CompDecimals);
-  const compDistributionPerDay = compSpeed.times(BlocksPerDay);
-  const denom = totalSupplyOrBorrow.times(usdcPerUnderlying);
-  const base = denom.notEqual(ZeroBD) ? OneBD.plus(compPrice.times(compDistributionPerDay).div(denom)) : ZeroBD;
-  return base.times(BlocksPerYear);
+  if (totalSupplyUSD.equals(ZeroBD)) {
+    return ZeroBD;
+  }
+
+  const compPriceUSD = getTokenPrice(Address.fromString(CompAddress), CompDecimals);
+  const compSpeedSupplyPerDay = compSpeedSupplyPerBlock.times(BlocksPerDay);
+
+  const base = OneBD.plus(compPriceUSD.times(compSpeedSupplyPerDay).div(totalSupplyUSD.times(exchangeRate)));
+  let result = OneBD;
+
+  for (let i = ZeroBI; i.lt(DayPerYear); i = i.plus(OneBI)) {
+    result = result.times(base);
+  }
+
+  return result.minus(OneBD).times(OneHundredBD);
+}
+
+function calculateCompBorrowDistrubtionAPY(totalBorrowUSD: BigDecimal, compSpeedBorroPerBlock: BigDecimal): BigDecimal {
+  if (totalBorrowUSD.equals(ZeroBD)) {
+    return ZeroBD;
+  }
+
+  const compPriceUSD = getTokenPrice(Address.fromString(CompAddress), CompDecimals);
+  const compSpeedBorrowPerDay = compSpeedBorroPerBlock.times(BlocksPerDay);
+
+  const base = OneBD.plus(compPriceUSD.times(compSpeedBorrowPerDay).div(totalBorrowUSD));
+  let result = OneBD;
+
+  for (let i = ZeroBI; i.lt(DayPerYear); i = i.plus(OneBI)) {
+    result = result.times(base);
+  }
+
+  return result.minus(OneBD).times(OneHundredBD);
 }
 
 function updateCommonMarket(market: Market, event: ethereum.Event): void {
@@ -44,26 +88,30 @@ function updateCommonMarket(market: Market, event: ethereum.Event): void {
   market.totalSupply = amountToDecimal(contract.totalSupply(), CTokenDecimals).times(market.exchangeRate);
   market.totalSupplyUSD = market.totalSupply.times(market.underlyingPriceUSD);
   market.supplyRatePerBlock = amountToDecimal(contract.supplyRatePerBlock(), MantissaFactor);
-  market.supplyAPY = market.supplyRatePerBlock.times(BlocksPerYear);
+  market.supplyAPY = calculateAPY(market.supplyRatePerBlock);
   //market.compSpeedSupply = amountToDecimal(tryCompSpeedSupply.value, MantissaFactor); // CompSupplySpeedUpdated evet
-  const compSupplyAPY = calculateCompDistrubtionApy(market.totalSupply, market.compSpeedSupply, market.underlyingPriceUSD);
+  const compSupplyAPY = calculateCompSupplyDistrubtionAPY(
+    market.totalSupplyUSD,
+    market.exchangeRate,
+    market.compSpeedSupplyPerBlock
+  );
   market.totalSupplyAPY = market.supplyAPY.plus(compSupplyAPY);
   //market.numberOfBorrowers = ZeroBI;
   market.totalBorrow = amountToDecimal(contract.totalBorrows(), market.underlyingDecimals);
   market.totalBorrowUSD = market.totalBorrow.times(market.underlyingPriceUSD);
   market.borrowRatePerBlock = amountToDecimal(contract.borrowRatePerBlock(), MantissaFactor);
-  market.borrowAPY = market.borrowRatePerBlock.times(BlocksPerYear);
+  market.borrowAPY = calculateAPY(market.borrowRatePerBlock);
   market.borrowIndex = amountToDecimal(contract.borrowIndex(), MantissaFactor);
-  //market.borrowCap = amountToDecimal(tryBorrowCaps.value, BigInt.fromU32(18));
+  //market.borrowCap = amountToDecimal(tryBorrowCaps.value, BigInt.fromU32(18)); // NewBorrowCap event
   //market.compSpeedBorrow = amountToDecimal(tryCompSpeedBorrow.value, MantissaFactor); // CompBorrowSpeedUpdated event
-  const compBorrowAPY = calculateCompDistrubtionApy(market.totalBorrow, market.compSpeedBorrow, market.underlyingPriceUSD);
+  const compBorrowAPY = calculateCompBorrowDistrubtionAPY(market.totalBorrowUSD, market.compSpeedBorrowPerBlock);
   market.totalBorrowAPY = market.borrowAPY.minus(compBorrowAPY);
-  market.reserveFactor = amountToDecimal(contract.reserveFactorMantissa(), MantissaFactor);
+  market.reserveFactorPercent = amountToDecimal(contract.reserveFactorMantissa(), MantissaFactor).times(OneHundredBD);
   market.totalReserves = amountToDecimal(contract.totalReserves(), market.underlyingDecimals);
   market.totalReservesUSD = market.totalReserves.times(market.underlyingPriceUSD);
   market.cash = amountToDecimal(contract.getCash(), market.underlyingDecimals);
 
-  let availableLiquidity = market.totalSupply.times(market.collateralFactor).minus(market.totalBorrow);
+  let availableLiquidity = market.totalSupply.times(market.collateralFactorPercent.div(OneHundredBD)).minus(market.totalBorrow);
 
   // Clamp to min of 0
   if (availableLiquidity.lt(ZeroBD)) {

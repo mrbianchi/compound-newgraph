@@ -1,5 +1,5 @@
 import { log } from "@graphprotocol/graph-ts";
-import { MantissaFactor } from "../../constants";
+import { MantissaFactor, OneHundredBD } from "../../constants";
 import { NewCollateralFactor } from "../../types/Comptroller/Comptroller";
 import { getMarket, isNonFunctionalMarket } from "../../utils";
 import { amountToDecimal } from "../../utils/amountToDecimal";
@@ -16,7 +16,9 @@ export function handleNewCollateralFactor(event: NewCollateralFactor): void {
 
   market.latestBlockNumber = event.block.number;
   market.latestBlockTimestamp = event.block.timestamp;
-  market.collateralFactor = amountToDecimal(event.params.newCollateralFactorMantissa, MantissaFactor);
+  market.collateralFactorPercent = amountToDecimal(event.params.newCollateralFactorMantissa, MantissaFactor).times(
+    OneHundredBD
+  );
 
   market.save();
 }

@@ -5,6 +5,7 @@ import { Comptroller } from "../../src/types/schema";
 export abstract class ComptrollerDefaultValues {
   public static readonly Id: string = DefaultComptrollerId;
   public static readonly PriceOracleAddress: string = "0xfafafa0000000000000000000000000000000001";
+  public static readonly PricepriceOracleSinceBlockNumber: u64 = 0;
   public static readonly LiquidationIncentive: BigDecimal = ZeroBD;
   public static readonly CloseFactor: BigDecimal = ZeroBD;
   public static readonly TransfersPaused: boolean = false;
@@ -20,6 +21,7 @@ export abstract class ComptrollerDefaultValues {
 export class ComptrollerBuilder {
   private id: string = ComptrollerDefaultValues.Id;
   private priceOracleAddress: string = ComptrollerDefaultValues.PriceOracleAddress;
+  private pricepriceOracleSinceBlockNumber: u64 = ComptrollerDefaultValues.PricepriceOracleSinceBlockNumber;
   private liquidationIncentive: BigDecimal = ComptrollerDefaultValues.LiquidationIncentive;
   private closeFactor: BigDecimal = ComptrollerDefaultValues.CloseFactor;
   private transfersPaused: boolean = ComptrollerDefaultValues.TransfersPaused;
@@ -34,6 +36,7 @@ export class ComptrollerBuilder {
   build(): Comptroller {
     const entity = new Comptroller(this.id);
     entity.priceOracleAddress = Bytes.fromHexString(this.priceOracleAddress);
+    entity.priceOracleSinceBlockNumber = BigInt.fromU64(this.pricepriceOracleSinceBlockNumber);
     entity.liquidationIncentive = this.liquidationIncentive;
     entity.closeFactor = this.closeFactor;
     entity.transfersPaused = this.transfersPaused;

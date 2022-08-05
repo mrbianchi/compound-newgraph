@@ -10,7 +10,7 @@ function createEvent(): NewCloseFactor {
   event.parameters.push(
     new ethereum.EventParam(
       "newCloseFactor",
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromU64(ComptrollerDefaultValues.CloseFactor))
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromString(ComptrollerDefaultValues.CloseFactor.toString()))
     )
   );
   return event;

@@ -4,6 +4,7 @@ import { Comptroller } from "../types/schema";
 export function createComptroller(): Comptroller {
   const comptroller = new Comptroller(DefaultComptrollerId);
   comptroller.priceOracleAddress = NullAddress;
+  comptroller.priceOracleSinceBlockNumber = ZeroBI;
   comptroller.closeFactor = ZeroBD;
   comptroller.liquidationIncentive = ZeroBD;
   comptroller.transfersPaused = false;

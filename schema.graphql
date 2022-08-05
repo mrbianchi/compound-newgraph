@@ -5,7 +5,7 @@ type Comptroller @entity {
   priceOracleAddress: Bytes!
 
   "Block number when the price oracle was last updated"
-  oracleSinceBlockNumber: BigInt!
+  priceOracleSinceBlockNumber: BigInt!
   
   "Current factor used to determine repayAmount for liquidating"
   closeFactor: BigDecimal!
@@ -104,7 +104,7 @@ type Market @entity {
   name: String!
 
   "Collateral factor determining how much one can borrow"
-  collateralFactor: BigDecimal!
+  collateralFactorPercent: BigDecimal!
   
   "Underlying token symbol"
   underlyingSymbol: String!
@@ -143,7 +143,7 @@ type Market @entity {
   totalSupplyAPY: BigDecimal!
 
   "COMP distribution per block for suppliers, this is the value from the contract with the 10^18 scaling removed"
-  compSpeedSupply: BigDecimal!
+  compSpeedSupplyPerBlock: BigDecimal!
   
   "Number of borrowers active in the market"
   numberOfBorrowers: BigInt!
@@ -170,10 +170,10 @@ type Market @entity {
   borrowCap: BigDecimal!
 
   "COMP distribution per block for borrowers, this is the value from the contract with the 10^18 scaling removed"
-  compSpeedBorrow: BigDecimal!
+  compSpeedBorrowPerBlock: BigDecimal!
 
   "The factor determining interest that goes to reserves"
-  reserveFactor: BigDecimal!
+  reserveFactorPercent: BigDecimal!
 
   "Total amount of underlying token in reserves"
   totalReserves: BigDecimal!
@@ -214,7 +214,7 @@ type MarketHourData @entity {
   transactionsCount: BigInt!
 
   "Collateral factor determining how much one can borrow"
-  collateralFactor: BigDecimal!
+  collateralFactorPercent: BigDecimal!
   
   "Underlying token price in native token"
   underlyingPriceNative: BigDecimal!
@@ -241,7 +241,7 @@ type MarketHourData @entity {
   totalSupplyAPY: BigDecimal!
 
   "COMP distribution per block for suppliers, this is the value from the contract with the 10^18 scaling removed"
-  compSpeedSupply: BigDecimal!
+  compSpeedSupplyPerBlock: BigDecimal!
   
   "Number of borrowers active in the market"
   numberOfBorrowers: BigDecimal!
@@ -268,10 +268,10 @@ type MarketHourData @entity {
   borrowCap: BigDecimal!
 
   "COMP distribution per block for borrowers, this is the value from the contract with the 10^18 scaling removed"
-  compSpeedBorrow: BigDecimal!
+  compSpeedBorrowPerBlock: BigDecimal!
 
   "The factor determining interest that goes to reserves"
-  reserveFactor: BigDecimal!
+  reserveFactorPercent: BigDecimal!
 
   "Total amount of underlying token in reserves"
   totalReserves: BigDecimal!

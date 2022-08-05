@@ -16,7 +16,7 @@ export function handleCompSupplySpeedUpdated(event: CompSupplySpeedUpdated): voi
 
   market.latestBlockNumber = event.block.number;
   market.latestBlockTimestamp = event.block.timestamp;
-  market.compSpeedSupply = amountToDecimal(event.params.newSpeed, MantissaFactor);
+  market.compSpeedSupplyPerBlock = amountToDecimal(event.params.newSpeed, MantissaFactor);
 
   market.save();
 }

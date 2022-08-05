@@ -1,5 +1,5 @@
 import { log } from "@graphprotocol/graph-ts";
-import { MantissaFactor } from "../../constants";
+import { MantissaFactor, OneHundredBD } from "../../constants";
 import { NewReserveFactor } from "../../types/templates/CToken/CToken";
 import { getMarket, isNonFunctionalMarket } from "../../utils";
 import { amountToDecimal } from "../../utils/amountToDecimal";
@@ -13,6 +13,6 @@ export function handleNewReserveFactor(event: NewReserveFactor): void {
   }
 
   const market = getMarket(marketId, event);
-  market.reserveFactor = amountToDecimal(event.params.newReserveFactorMantissa, MantissaFactor);
+  market.reserveFactorPercent = amountToDecimal(event.params.newReserveFactorMantissa, MantissaFactor).times(OneHundredBD);
   market.save();
 }
