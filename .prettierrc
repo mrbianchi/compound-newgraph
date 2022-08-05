@@ -3,9 +3,11 @@
   "singleQuote": false,
   "tabWidth": 2,
   "useTabs": false,
-  "trailingComma": "all",
+  "trailingComma": "es5",
   "printWidth": 128,
   "bracketSpacing": true,
   "bracketSameLine": true,
-  "arrowParens": "always"
+  "arrowParens": "always",
+  "importOrder": ["<THIRD_PARTY_MODULES>", "^[./]"],
+  "importOrderSortSpecifiers": true
 }

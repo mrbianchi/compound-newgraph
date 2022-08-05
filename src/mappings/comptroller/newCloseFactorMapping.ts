@@ -1,15 +1,12 @@
-import { log } from "@graphprotocol/graph-ts";
+import { MantissaFactor } from "../../constants";
 import { NewCloseFactor } from "../../types/Comptroller/Comptroller";
-import { Comptroller } from "../../types/schema";
+import { getComptroller } from "../../utils";
+import { amountToDecimal } from "../../utils/amountToDecimal";
 
 export function handleNewCloseFactor(event: NewCloseFactor): void {
-  const comptroller = Comptroller.load("1");
+  const comptroller = getComptroller();
 
-  if (!comptroller) {
-    log.info("Comptroller(1) not found", []);
-    return;
-  }
+  comptroller.closeFactor = amountToDecimal(event.params.newCloseFactorMantissa, MantissaFactor);
 
-  comptroller.closeFactor = event.params.newCloseFactorMantissa;
   comptroller.save();
 }

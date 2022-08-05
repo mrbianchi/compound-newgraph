@@ -15,25 +15,26 @@
     "lint:fix": "eslint --fix .",
     "test": "graph test",
     "codegen": "graph codegen --output-dir src/types/",
-    "build": "graph build",
+    "build": "node scripts/build.js",
     "create-local": "graph create subgraph --node http://localhost:8020",
     "deploy-local": "graph deploy subgraph --debug --ipfs http://localhost:5001 --node http://localhost:8020/",
-    "watch-local": "graph deploy subgraph --watch --debug --node http://localhost:8020/ --ipfs http://localhost:5001",
-    "deploy:kovan": "graph deploy --product hosted-service javier747belbruno/compound-new-graph"
+    "watch-local": "graph deploy subgraph --watch --debug --node http://localhost:8020/ --ipfs http://localhost:5001"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "0.32.0",
     "@graphprotocol/graph-ts": "0.27.0",
+    "@trivago/prettier-plugin-sort-imports": "3.2.0",
     "@types/node": "16.11.43",
-    "@typescript-eslint/eslint-plugin": "5.30.3",
-    "@typescript-eslint/parser": "5.30.3",
+    "@typescript-eslint/eslint-plugin": "5.30.6",
+    "@typescript-eslint/parser": "5.30.6",
     "eslint": "8.19.0",
     "eslint-config-prettier": "8.5.0",
     "eslint-plugin-import": "2.26.0",
     "husky": "8.0.1",
     "matchstick-as": "0.5.0",
     "prettier": "2.7.1",
-    "ts-node": "10.8.2",
-    "typescript": "4.7.4"
+    "ts-node": "10.9.1",
+    "typescript": "4.7.4",
+    "yargs": "17.5.1"
   }
 }

@@ -1,0 +1,26 @@
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+
+export * from "./globalActionTypes";
+export * from "./marketActionTypes";
+export * from "./networkAddresses";
+export * from "./proposalStatuses";
+export const NativeTokenName = "Ether";
+export const NativeTokenSymbol = "ETH";
+export const NativeTokenDecimals = 18;
+export const CTokenDecimals = 8;
+export const CompDecimals = 18;
+export const DefaultComptrollerId = "Comptroller";
+export const MantissaFactor = 18;
+export const NullAddress = Address.zero();
+export const NullAddressString = NullAddress.toHexString();
+export const ZeroBI = BigInt.zero();
+export const OneBI = BigInt.fromU32(1);
+export const ZeroBD = BigDecimal.zero();
+export const OneBD = BigDecimal.fromString("1");
+export const OneHundredBD = BigDecimal.fromString("100");
+export const SecondsPerHour = BigInt.fromU32(3600);
+export const SecondsPerDay = BigInt.fromU32(86400);
+export const DayPerYear = BigInt.fromI32(365);
+export const SecondsPerBlock = BigDecimal.fromString("13.5");
+export const BlocksPerSec = OneBD.div(SecondsPerBlock);
+export const BlocksPerDay = BlocksPerSec.times(SecondsPerDay.toBigDecimal());

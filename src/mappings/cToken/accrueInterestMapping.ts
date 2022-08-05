@@ -1,10 +1,23 @@
 import { log } from "@graphprotocol/graph-ts";
 import { AccrueInterest } from "../../types/templates/CToken/CToken";
+import { getMarket, isNonFunctionalMarket, updateMarket } from "../../utils";
+import { updateAllHistoricalData } from "../../utils/updateAllHistoricalData";
 
+/* Notes
+ *    Executed always first on Borrow, Liquidate, Mint, Redeem and RepayBorrow
+ */
 export function handleAccrueInterest(event: AccrueInterest): void {
-  log.info("AccrueInterest event handled", []);
-  log.info("param cashPrior: {}", [event.params.cashPrior.toString()]);
-  log.info("param interestAccumulated: {}", [event.params.interestAccumulated.toString()]);
-  log.info("param borrowIndex: {}", [event.params.borrowIndex.toString()]);
-  log.info("param totalBorrows: {}", [event.params.totalBorrows.toString()]);
+  const marketId = event.address.toHexString();
+
+  if (isNonFunctionalMarket(marketId)) {
+    log.error("Non functional market {}", [marketId]);
+    return;
+  }
+
+  const market = getMarket(marketId, event);
+
+  updateMarket(market, event);
+  updateAllHistoricalData(market, event);
+
+  market.save();
 }

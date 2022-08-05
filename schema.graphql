@@ -1,144 +1,650 @@
-# Comptroller global variables
 type Comptroller @entity {
-    "ID is set to 1"
-    id: ID!
-    "Address of price oracle the comptroller uses"
-    priceOracle: Bytes
-    "Factor used to determine repayAmount for liquidating"
-    closeFactor: BigInt
-    "The percent bonus liquidators get for liquidating"
-    liquidationIncentive: BigInt
-    "Max assets a single user can enter"
-    maxAssets: BigInt
+  id: String!
+  
+  "Address of price oracle the comptroller uses"
+  priceOracleAddress: Bytes!
+
+  "Block number when the price oracle was last updated"
+  priceOracleSinceBlockNumber: BigInt!
+  
+  "Current factor used to determine repayAmount for liquidating"
+  closeFactor: BigDecimal!
+  
+  "The current percent bonus liquidators get for liquidating"
+  liquidationIncentive: BigDecimal!
+  
+  "Transfers paused globally"
+  transfersPaused: Boolean!
+  
+  "Seizes paused globally"
+  seizesPaused: Boolean!
+
+  "Most recent block number where summary data was updated"
+  latestBlockNumber: BigInt!
+  
+  "Most recent block timestamp where summary data was updated"
+  latestBlockTimestamp: BigInt!
+  
+  "Total supply of the entire protocol in USD"
+  totalSupplyUSD: BigDecimal!
+  
+  "Total borrow of the entire protocol in USD"
+  totalBorrowUSD: BigDecimal!
+  
+  "Total reserves of the entire protocol in USD"
+  totalReservesUSD: BigDecimal!
+  
+  "Utilization of the entire protocol"
+  utilization: BigDecimal!
+
+  "All the markets that the comptroller controls"
+  markets: [Market!]!
+
+  "Historical data in hourly intervals"
+  historicalHourData: [ComptrollerHourData!] @derivedFrom(field: "comptroller")
 }
 
-# Market inforamtion for a CToken
-type Market @entity { # TODO rename to CToken, not market AND ALL OTHERS
-    #Fields that match compounds API
-    "Yearly borrow rate. With 2102400 blocks per year"
-    borrowRate: BigDecimal!
-    "The cToken contract balance of ERC20 or ETH"
-    cash: BigDecimal!
-    "Collateral factor determining how much one can borrow"
-    collateralFactor: BigDecimal!
-    "Exchange rate of tokens / cTokens"
-    exchangeRate:  BigDecimal!
-    "Address of the interest rate model"
-    interestRateModelAddress: Bytes!
-    "Name of the cToken"
-    name: String!
-    "Number of borrowers active in the market"
-    numberOfBorrowers: Int!
-    "Number of suppliers active in the market"
-    numberOfSuppliers: Int!
-    "Reserves stored in the contract"
-    reserves: BigDecimal!
-    "Yearly supply rate. With 2104400 blocks per year"
-    supplyRate: BigDecimal!
-    "CToken symbol"
-    symbol: String!
-    "CToken address"
-    id: ID!
-    "Borrows in the market"
-    totalBorrows: BigDecimal!
-    "CToken supply. CTokens have 8 decimals"
-    totalSupply: BigDecimal!
-    "Underlying token address"
-    underlyingAddress: Bytes!
-    "Underlying token name"
-    underlyingName: String!
-    "Underlying price of token in ETH (ex. 0.007 DAI)"
-    underlyingPrice: BigDecimal!
-    "Underlying token symbol"
-    underlyingSymbol: String!
+type ComptrollerHourData @entity {
+  "Comptroller Id concatendated with timestamp"
+  id: String!
 
-    # Fields that are not in compounds api
-    "Block the market is updated to"
-    accrualBlockNumber: Int!
-    "Timestamp the market was most recently updated"
-    blockTimestamp: Int!
-    "The history of the markets borrow index return (Think S&P 500)"
-    borrowIndex: BigDecimal!
-    "The factor determining interest that goes to reserves"
-    reserveFactor: BigInt!
-    "Underlying token price in USD"
-    underlyingPriceUSD: BigDecimal!
-    "Underlying token decimal length"
-    underlyingDecimals: Int!
+  "Relation to comptroller"
+  comptroller: Comptroller!
+
+  "Unix timestamp in seconds rounded to the start of the hour"
+  timestamp: BigInt!
+
+  "Number of transactions that went into deriving this data entry"
+  transactionsCount: BigInt!
+
+  "Total supply of the entire protocol in USD"
+  totalSupplyUSD: BigDecimal!
+  
+  "Total borrow of the entire protocol in USD"
+  totalBorrowUSD: BigDecimal!
+  
+  "Total reserves of the entire protocol in USD"
+  totalReservesUSD: BigDecimal!
+
+  "Utilization of the entire protocol"
+  utilization: BigDecimal!
 }
 
-# Users within the protocol
+### Markets (cToken) ###
+
+type Market @entity {
+  "Market address"
+  id: String!
+  
+  "Block number when the market was created"
+  creationBlockNumber: BigInt!
+
+  "Block timestamp when the market was created"
+  creationBlockTimestamp: BigInt!
+  
+  "Most recent block number where the market was updated"
+  latestBlockNumber: BigInt!
+  
+  "Most recent block timestamp where the market was updated"
+  latestBlockTimestamp: BigInt!
+  
+  "Mints paused"
+  mintsPaused: Boolean!
+
+  "Borrows paused"
+  borrowsPaused: Boolean!
+
+  "Address of the interest rate model"
+  interestRateModelAddress: Bytes!
+  
+  "Market symbol"
+  symbol: String!
+  
+  "Market name"
+  name: String!
+
+  "Collateral factor determining how much one can borrow"
+  collateralFactorPercent: BigDecimal!
+  
+  "Underlying token symbol"
+  underlyingSymbol: String!
+  
+  "Underlying token name"
+  underlyingName: String!
+  
+  "Underlying token address"
+  underlyingAddress: Bytes!
+  
+  "Underlying token decimal length"
+  underlyingDecimals: Int!
+  
+  "Underlying token price in native token"
+  underlyingPriceNative: BigDecimal!
+  
+  "Underlying token price in USD"
+  underlyingPriceUSD: BigDecimal!
+  
+  "Number of suppliers active in the market"
+  numberOfSuppliers: BigInt!
+  
+  "Total amount of underlying tokens supplied"
+  totalSupply: BigDecimal!
+  
+  "Total amount of underlying tokens supplied in USD"
+  totalSupplyUSD: BigDecimal!
+
+  "Supply APY not including the COMP distribution in decimal form"
+  supplyAPY: BigDecimal!
+
+  "Supply rate per block, this is the value from the contract with the 10^18 scaling removed"
+  supplyRatePerBlock: BigDecimal!
+
+  "Total supply apy including the COMP distribution in decimal form"
+  totalSupplyAPY: BigDecimal!
+
+  "COMP distribution per block for suppliers, this is the value from the contract with the 10^18 scaling removed"
+  compSpeedSupplyPerBlock: BigDecimal!
+  
+  "Number of borrowers active in the market"
+  numberOfBorrowers: BigInt!
+
+  "Total amount of underlying tokens borrowed"
+  totalBorrow: BigDecimal!
+  
+  "Total amount of underlying tokens borrowed in USD"
+  totalBorrowUSD: BigDecimal!
+
+  "Borrow APY not including the COMP distribution in decimal form"
+  borrowAPY: BigDecimal!
+
+  "Borrow rate per block, this is the value from the contract with the 10^18 scaling removed"
+  borrowRatePerBlock: BigDecimal!
+
+  "Total borrow APY including the COMP distribution in decimal form"
+  totalBorrowAPY: BigDecimal!
+
+  "The history of the markets borrow index return (Think S&P 500)"
+  borrowIndex: BigDecimal!
+
+  "borrow cap in underlying tokens"
+  borrowCap: BigDecimal!
+
+  "COMP distribution per block for borrowers, this is the value from the contract with the 10^18 scaling removed"
+  compSpeedBorrowPerBlock: BigDecimal!
+
+  "The factor determining interest that goes to reserves"
+  reserveFactorPercent: BigDecimal!
+
+  "Total amount of underlying token in reserves"
+  totalReserves: BigDecimal!
+
+  "Total amount of underlying token in reserves in USD"
+  totalReservesUSD: BigDecimal!
+
+  "The market contract balance of ERC20 or native token"
+  cash: BigDecimal!
+
+  "Total available to be borrowed in the underlying asset"
+  availableLiquidity: BigDecimal!
+  
+  "Total available to be borrowed in the underlying asset in USD"
+  availableLiquidityUSD: BigDecimal!
+  
+  "Utilization of the market"
+  utilization: BigDecimal!
+
+  "Exchange rate of underlying tokens / cTokens"
+  exchangeRate:  BigDecimal!
+
+  "Historical data in hourly intervals"
+  historicalHourData: [MarketHourData!] @derivedFrom(field: "market")
+}
+
+type MarketHourData @entity {
+  "Market address concatendated with timestamp"
+  id: String!
+    
+  "Market that this data belongs to"
+  market: Market!
+
+  "Unix timestamp in seconds rounded to the start of the hour"
+  timestamp: BigInt!
+
+  "Number of transactions that went into deriving this data entry"
+  transactionsCount: BigInt!
+
+  "Collateral factor determining how much one can borrow"
+  collateralFactorPercent: BigDecimal!
+  
+  "Underlying token price in native token"
+  underlyingPriceNative: BigDecimal!
+  
+  "Underlying token price in USD"
+  underlyingPriceUSD: BigDecimal!
+  
+  "Number of suppliers active in the market"
+  numberOfSuppliers: BigDecimal!
+  
+  "Total amount of underlying tokens supplied"
+  totalSupply: BigDecimal!
+  
+  "Total amount of underlying tokens supplied in USD"
+  totalSupplyUSD: BigDecimal!
+
+  "Supply APY not including the COMP distribution in decimal form"
+  supplyAPY: BigDecimal!
+
+  "Supply rate per block, this is the value from the contract with the 10^18 scaling removed"
+  supplyRatePerBlock: BigDecimal!
+
+  "Total supply apy including the COMP distribution in decimal form"
+  totalSupplyAPY: BigDecimal!
+
+  "COMP distribution per block for suppliers, this is the value from the contract with the 10^18 scaling removed"
+  compSpeedSupplyPerBlock: BigDecimal!
+  
+  "Number of borrowers active in the market"
+  numberOfBorrowers: BigDecimal!
+
+  "Total amount of underlying tokens borrowed"
+  totalBorrow: BigDecimal!
+  
+  "Total amount of underlying tokens borrowed in USD"
+  totalBorrowUSD: BigDecimal!
+
+  "Borrow APY not including the COMP distribution in decimal form"
+  borrowAPY: BigDecimal!
+
+  "Borrow rate per block, this is the value from the contract with the 10^18 scaling removed"
+  borrowRatePerBlock: BigDecimal!
+
+  "Total borrow APY including the COMP distribution in decimal form"
+  totalBorrowAPY: BigDecimal!
+
+  "The history of the markets borrow index return (Think S&P 500)"
+  borrowIndex: BigDecimal!
+
+  "borrow cap in underlying tokens"
+  borrowCap: BigDecimal!
+
+  "COMP distribution per block for borrowers, this is the value from the contract with the 10^18 scaling removed"
+  compSpeedBorrowPerBlock: BigDecimal!
+
+  "The factor determining interest that goes to reserves"
+  reserveFactorPercent: BigDecimal!
+
+  "Total amount of underlying token in reserves"
+  totalReserves: BigDecimal!
+
+  "Total amount of underlying token in reserves in USD"
+  totalReservesUSD: BigDecimal!
+
+  "The market contract balance of ERC20 or native token"
+  cash: BigDecimal!
+
+  "Total available to be borrowed in the underlying asset"
+  availableLiquidity: BigDecimal!
+  
+  "Total available to be borrowed in the underlying asset in USD"
+  availableLiquidityUSD: BigDecimal!
+  
+  "Utilization of the market"
+  utilization: BigDecimal!
+
+  "Exchange rate of underlying tokens / cTokens"
+  exchangeRate:  BigDecimal!
+}
+
+interface MarketEvent {
+  "Transaction hash concatenated with log index"
+  id: String!
+
+  "Relation to market"
+  market: Market!
+  
+  "Block number of event"
+  blockNumber: BigInt!
+
+  "Block timestamp of event"
+  blockTimestamp: BigInt!
+  
+  "Account that sent tokens"
+  from: Bytes!
+  
+  "Account that received tokens"
+  to: Bytes!
+  
+  "Tokens transferred"
+  amount: BigDecimal!
+}
+
+"""
+TransferEvent will be stored for every mint, redeem, liquidation, and any normal transfer between two accounts.
+"""
+type TransferEvent implements MarketEvent @entity(immutable: true) {
+  "Transaction hash concatenated with log index"
+  id: String!
+  
+  "Relation to market"
+  market: Market!
+  
+  "Block number of event"
+  blockNumber: BigInt!
+
+  "Block timestamp of event"
+  blockTimestamp: BigInt!
+
+  "Account that sent tokens"
+  from: Bytes!
+
+  "Account that received tokens"
+  to: Bytes!
+
+  "Tokens transferred"
+  amount: BigDecimal!
+}
+
+"""
+MintEvent stores information for mints. From address will always be a market address
+"""
+type MintEvent implements MarketEvent @entity(immutable: true) {
+  "Transaction hash concatenated with log index"
+  id: String!
+  
+  "Relation to market"
+  market: Market!
+  
+  "Block number of event"
+  blockNumber: BigInt!
+
+  "Block timestamp of event"
+  blockTimestamp: BigInt!
+
+  "Account that sent tokens (market contract)"
+  from: Bytes!
+
+  "Account that received tokens (minter)"
+  to: Bytes!
+
+  "Tokens transferred"
+  amount: BigDecimal!
+
+  "Underlying token amount transferred"
+  underlyingAmount: BigDecimal!
+}
+
+"""
+RedeemEvent stores information for redeems. To address will always be a market address
+"""
+type RedeemEvent implements MarketEvent @entity(immutable: true) {
+  "Transaction hash concatenated with log index"
+  id: String!
+  
+  "Relation to market"
+  market: Market!
+  
+  "Block number of event"
+  blockNumber: BigInt!
+
+  "Block timestamp of event"
+  blockTimestamp: BigInt!
+
+  "Account that sent tokens (redeemer)"
+  from: Bytes!
+
+  "Account that received tokens (market contract)"
+  to: Bytes!
+
+  "Tokens transferred"
+  amount: BigDecimal!
+
+  "Underlying token amount transferred"
+  underlyingAmount: BigDecimal!
+}
+
+"""
+LiquidationEvent stores information for liquidations. The event is emitted from the market address.
+"""
+type LiquidationEvent implements MarketEvent @entity(immutable: true) {
+  "Transaction hash concatenated with log index"
+  id: String!
+  
+  "Relation to market"
+  market: Market!
+  
+  "Block number of event"
+  blockNumber: BigInt!
+
+  "Block timestamp of event"
+  blockTimestamp: BigInt!
+
+  "Account being liquidated (borrower)"
+  from: Bytes!
+
+  "Liquidator receiving tokens"
+  to: Bytes!
+
+  "Tokens transferred"
+  amount: BigDecimal!
+
+  "Underlying market amount that was repaid by liquidator"
+  underlyingRepayAmount: BigDecimal!
+}
+
+"""
+Underlying transfers are transfers of underlying collateral for both borrows and repays
+"""
+interface UnderlyingEvent {
+  "Transaction hash concatenated with log index"
+  id: String!
+  
+  "Relation to market"
+  market: Market!
+  
+  "Block number of event"
+  blockNumber: BigInt!
+  
+  "Block timestamp of event"
+  blockTimestamp: BigInt!
+  
+  "Account that borrowed the tokens"
+  borrower: Bytes!
+  
+  "Amount of underlying borrowed"
+  amount: BigDecimal!
+  
+  "Total borrows of this asset the account has"
+  accountBorrows: BigDecimal!
+}
+
+"""
+BorrowEvent stores information for borrows
+"""
+type BorrowUnderlyingEvent implements UnderlyingEvent @entity(immutable: true) {
+  "Transaction hash concatenated with log index"
+  id: String!
+  
+  "Relation to market"
+  market: Market!
+  
+  "Block number of event"
+  blockNumber: BigInt!
+  
+  "Block timestamp of event"
+  blockTimestamp: BigInt!
+  
+  "Account that borrowed the tokens"
+  borrower: Bytes!
+  
+  "Amount of underlying borrowed"
+  amount: BigDecimal!
+  
+  "Total borrows of this asset the account has"
+  accountBorrows: BigDecimal!
+}
+
+"""
+RepayEvent stores information for repays. Payer is not always the same as borrower, such as in the event of a Liquidation
+"""
+type RepayUnderlyingEvent implements UnderlyingEvent @entity(immutable: true) {
+  "Transaction hash concatenated with log index"
+  id: String!
+  
+  "Relation to market"
+  market: Market!
+  
+  "Block number of event"
+  blockNumber: BigInt!
+  
+  "Block timestamp of event"
+  blockTimestamp: BigInt!
+  
+  "Account that borrowed the tokens"
+  borrower: Bytes!
+  
+  "Payer of the borrow funds"
+  payer: Bytes!
+  
+  "Amount of underlying borrowed"
+  amount: BigDecimal!
+  
+  "Total borrows of this asset the account has"
+  accountBorrows: BigDecimal!
+}
+
+### Accounts ###
+
 type Account @entity {
-    "User ETH address"
-    id: ID!
-    "Array of CTokens user is in"
-    tokens: [AccountCToken!]! @derivedFrom(field: "account")
-    "Count user has been liquidated"
-    countLiquidated: Int!
-    "Count user has liquidated others"
-    countLiquidator: Int!
-    "True if user has ever borrowed"
-    hasBorrowed: Boolean!
+  "Account address"
+  id: String!
 
-    # The following values are added by the JS Wrapper, and must be calculated with the most up
-    # to date values based on the block delta for market.exchangeRate and market.borrowIndex
-    # They do not need to be in the schema, but they will show up in the explorer playground
+  "Block number when the account was created"
+  creationBlockNumber: BigInt!
 
-    # "If less than 1, the account can be liquidated
-    # health: BigDecimal!
-    # "Total assets supplied by user"
-    # totalBorrowValueInEth: BigDecimal!
-    # "Total assets borrowed from user"
-    # totalCollateralValueInEth: BigDecimal!
+  "Block timestamp when the account was created"
+  creationBlockTimestamp: BigInt!
+  
+  "Most recent block number where the account was updated"
+  latestBlockNumber: BigInt!
+  
+  "Most recent block timestamp where the account was updated"
+  latestBlockTimestamp: BigInt!
+
+  "Count user has been liquidated"
+  countLiquidated: BigInt!
+
+  "Count user has liquidated others"
+  countLiquidator: BigInt!
+  
+  "True if user has ever borrowed"
+  hasBorrowed: Boolean!
+  
+  "If less than 1, the account can be liquidated"
+  health: BigDecimal!
+  
+  "aggregate total of all supplied tokens by the user in all markets in USD"
+  totalUnderlyingSuppliedUSD: BigDecimal!
+  
+  "aggregate total of all borrowed tokens by the user in all markets in USD"
+  totalUnderlyingBorrowedUSD: BigDecimal!
+
+  "Array of markets user is in"
+  markets: [AccountMarket!] @derivedFrom(field: "account")
 }
 
-# Stats for an accounts borrow and supply of an asset
-type AccountCToken @entity {
-    "Concatenation of CToken address and user address"
-    id: ID!
-    "Relation to market"
-    market: Market!
-    "Symbol of the cToken"
-    symbol: String!
-    "Relation to user"
-    account: Account!
-    "Hashes of all user transactions"
-    transactionHashes: [Bytes!]!
-    "Times of all user transactions"
-    transactionTimes: [Int!]!
-    "Block number this asset was updated at in the contract"
-    accrualBlockNumber: Int!
-    "True if user is entered, false if they are exited"
-    enteredMarket: Boolean!
+type AccountMarket @entity {
+  "Concatenation of user address and market address"
+  id: String!
+  
+  "Relation to market"
+  market: Market!
+  
+  "Relation to account"
+  account: Account!
 
-    "CToken balance of the user"
-    cTokenBalance: BigDecimal!
-    "Total amount of underlying supplied"
-    totalUnderlyingSupplied: BigDecimal!
-    "Total amount of underling redeemed"
-    totalUnderlyingRedeemed: BigDecimal!
-    "The value of the borrow index upon users last interaction"
-    accountBorrowIndex: BigDecimal!
-    "Total amount underlying borrowed, exclusive of interest"
-    totalUnderlyingBorrowed: BigDecimal!
-    "Total amount underlying repaid"
-    totalUnderlyingRepaid: BigDecimal!
-    "Current borrow balance stored in contract (exclusive of interest since accrualBlockNumber)"
-    storedBorrowBalance: BigDecimal!
+  "Block number when the account market was created"
+  creationBlockNumber: BigInt!
 
-    # The following values are added by the JS Wrapper, and must be calculated with the most up
-    # to date values based on the block delta for market.exchangeRate and market.borrowIndex
-    # They do not need to be in the schema, but they will show up in the explorer playground
+  "Block timestamp when the account market was created"
+  creationBlockTimestamp: BigInt!
+  
+  "Most recent block number where the account market was updated"
+  latestBlockNumber: BigInt!
+  
+  "Most recent block timestamp where the account market was updated"
+  latestBlockTimestamp: BigInt!
+  
+  "True if user is entered, false if they are exited"
+  enteredMarket: Boolean!
+  
+  "market balance of the user"
+  balance: BigDecimal!
+  
+  "Total amount of underlying supplied"
+  totalUnderlyingSupplied: BigDecimal!
 
-    # supplyBalanceUnderlying: BigDecimal!
-    # FORMULA: supplyBalanceUnderlying = cTokenBalance * market.exchangeRate
+  "Total amount of underlying supplied in USD"
+  totalUnderlyingSuppliedUSD: BigDecimal!
+  
+  "Total amount of underling redeemed"
+  totalUnderlyingRedeemed: BigDecimal!
+  
+  "The value of the borrow index upon users last interaction"
+  accountBorrowIndex: BigDecimal!
+  
+  "Total amount of underlying borrowed by the account from the market plus the interest"
+  totalUnderlyingBorrowed: BigDecimal!
 
-    # lifetimeSupplyInterestAccrued: BigDecimal!
-    # FORMULA: lifetimeSupplyInterestAccrued = supplyBalanceUnderlying - totalUnderlyingSupplied + totalUnderlyingRedeemed
+  "Total amount of underlying borrowed by the account from the market plus the interest in USD"
+  totalUnderlyingBorrowedUSD: BigDecimal!
+  
+  "Total amount underlying repaid"
+  totalUnderlyingRepaid: BigDecimal!
+  
+  "Current borrow balance stored in contract (exclusive of interest since latestBlockNumber)"
+  storedBorrowBalance: BigDecimal!
 
-    # borrowBalanceUnderlying: BigDecimal!
-    # FORMULA: borrowBalanceUnderlying = storedBorrowBalance * market.borrowIndex / accountBorrowIndex
+  # The following values are added by the JS Wrapper, and must be calculated with the most up
+  # to date values based on the block delta for market.exchangeRate and market.borrowIndex
+  # They do not need to be in the schema, but they will show up in the explorer playground
 
-    # lifetimeBorrowInterestAccrued: BigDecimal!
-    # FORMULA: lifetimeBorrowInterestAccrued = borrowBalanceUnderlying - totalUnderlyingBorrowed + totalUnderlyingRepaid
+  # supplyBalanceUnderlying: BigDecimal!
+  # FORMULA: supplyBalanceUnderlying = cTokenBalance * market.exchangeRate
+  # lifetimeSupplyInterestAccrued: BigDecimal!
+  # FORMULA: lifetimeSupplyInterestAccrued = supplyBalanceUnderlying - totalUnderlyingSupplied + totalUnderlyingRedeemed
+  # borrowBalanceUnderlying: BigDecimal!
+  # FORMULA: borrowBalanceUnderlying = storedBorrowBalance * market.borrowIndex / accountBorrowIndex
+  # lifetimeBorrowInterestAccrued: BigDecimal!
+  # FORMULA: lifetimeBorrowInterestAccrued = borrowBalanceUnderlying - totalUnderlyingBorrowed + totalUnderlyingRepaid
+}
+
+### Proposals ###
+
+enum ProposalStatus {
+  Active
+  Canceled
+  Queued
+  Executed
+}
+
+type Proposal @entity {
+  id: String!
+  
+  status: ProposalStatus!
+  
+  proposer: Account!
+  
+  targets: [Account!]!
+  
+  values: [BigInt!]!
+  
+  signatures: [String!]!
+  
+  calldatas: [Bytes!]!
+  
+  startBlockNumber: BigInt!
+  
+  endBlockNumber: BigInt!
+  
+  description: String!
 }

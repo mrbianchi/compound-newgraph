@@ -1,8 +1,15 @@
-import { log } from "@graphprotocol/graph-ts";
+import { GlobalActionTypes } from "../../constants";
 import { ActionPaused } from "../../types/Comptroller/Comptroller";
+import { getComptroller } from "../../utils";
 
 export function handleGloballyActionPaused(event: ActionPaused): void {
-  log.info("ActionPaused event handled", []);
-  log.info("param action: {}", [event.params.action.toString()]);
-  log.info("param pauseState: {}", [event.params.pauseState.toString()]);
+  const comptroller = getComptroller();
+
+  if (event.params.action == GlobalActionTypes.Transfer) {
+    comptroller.transfersPaused = event.params.pauseState;
+  } else if (event.params.action == GlobalActionTypes.Seize) {
+    comptroller.seizesPaused = event.params.pauseState;
+  }
+
+  comptroller.save();
 }
