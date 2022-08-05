@@ -1,4 +1,4 @@
-# compound-newgraph
+# deepr-subgraph
 
 ## Dependencies
 

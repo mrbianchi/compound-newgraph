@@ -133,16 +133,16 @@ type Market @entity {
   "Total amount of underlying tokens supplied in USD"
   totalSupplyUSD: BigDecimal!
 
-  "Supply APY not including the COMP distribution in decimal form"
+  "Supply APY not including the DEEPR distribution in decimal form"
   supplyAPY: BigDecimal!
 
   "Supply rate per block, this is the value from the contract with the 10^18 scaling removed"
   supplyRatePerBlock: BigDecimal!
 
-  "Total supply apy including the COMP distribution in decimal form"
+  "Total supply apy including the DEEPR distribution in decimal form"
   totalSupplyAPY: BigDecimal!
 
-  "COMP distribution per block for suppliers, this is the value from the contract with the 10^18 scaling removed"
+  "DEEPR distribution per block for suppliers, this is the value from the contract with the 10^18 scaling removed"
   compSpeedSupplyPerBlock: BigDecimal!
   
   "Number of borrowers active in the market"
@@ -154,13 +154,13 @@ type Market @entity {
   "Total amount of underlying tokens borrowed in USD"
   totalBorrowUSD: BigDecimal!
 
-  "Borrow APY not including the COMP distribution in decimal form"
+  "Borrow APY not including the DEEPR distribution in decimal form"
   borrowAPY: BigDecimal!
 
   "Borrow rate per block, this is the value from the contract with the 10^18 scaling removed"
   borrowRatePerBlock: BigDecimal!
 
-  "Total borrow APY including the COMP distribution in decimal form"
+  "Total borrow APY including the DEEPR distribution in decimal form"
   totalBorrowAPY: BigDecimal!
 
   "The history of the markets borrow index return (Think S&P 500)"
@@ -169,7 +169,7 @@ type Market @entity {
   "borrow cap in underlying tokens"
   borrowCap: BigDecimal!
 
-  "COMP distribution per block for borrowers, this is the value from the contract with the 10^18 scaling removed"
+  "DEEPR distribution per block for borrowers, this is the value from the contract with the 10^18 scaling removed"
   compSpeedBorrowPerBlock: BigDecimal!
 
   "The factor determining interest that goes to reserves"
@@ -231,16 +231,16 @@ type MarketHourData @entity {
   "Total amount of underlying tokens supplied in USD"
   totalSupplyUSD: BigDecimal!
 
-  "Supply APY not including the COMP distribution in decimal form"
+  "Supply APY not including the DEEPR distribution in decimal form"
   supplyAPY: BigDecimal!
 
   "Supply rate per block, this is the value from the contract with the 10^18 scaling removed"
   supplyRatePerBlock: BigDecimal!
 
-  "Total supply apy including the COMP distribution in decimal form"
+  "Total supply apy including the DEEPR distribution in decimal form"
   totalSupplyAPY: BigDecimal!
 
-  "COMP distribution per block for suppliers, this is the value from the contract with the 10^18 scaling removed"
+  "DEEPR distribution per block for suppliers, this is the value from the contract with the 10^18 scaling removed"
   compSpeedSupplyPerBlock: BigDecimal!
   
   "Number of borrowers active in the market"
@@ -252,13 +252,13 @@ type MarketHourData @entity {
   "Total amount of underlying tokens borrowed in USD"
   totalBorrowUSD: BigDecimal!
 
-  "Borrow APY not including the COMP distribution in decimal form"
+  "Borrow APY not including the DEEPR distribution in decimal form"
   borrowAPY: BigDecimal!
 
   "Borrow rate per block, this is the value from the contract with the 10^18 scaling removed"
   borrowRatePerBlock: BigDecimal!
 
-  "Total borrow APY including the COMP distribution in decimal form"
+  "Total borrow APY including the DEEPR distribution in decimal form"
   totalBorrowAPY: BigDecimal!
 
   "The history of the markets borrow index return (Think S&P 500)"
@@ -267,7 +267,7 @@ type MarketHourData @entity {
   "borrow cap in underlying tokens"
   borrowCap: BigDecimal!
 
-  "COMP distribution per block for borrowers, this is the value from the contract with the 10^18 scaling removed"
+  "DEEPR distribution per block for borrowers, this is the value from the contract with the 10^18 scaling removed"
   compSpeedBorrowPerBlock: BigDecimal!
 
   "The factor determining interest that goes to reserves"
